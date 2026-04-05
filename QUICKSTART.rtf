@@ -1,0 +1,190 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 # SNAPBRAND Quick Start Guide (Prisma + PostgreSQL)\
+\
+Get your SNAPBRAND app up and running in 10 minutes.\
+\
+## 1. Install Dependencies \uc0\u9989  Done!\
+\
+Dependencies are already installed. Verify:\
+```bash\
+npm list | grep prisma\
+npm list | grep next-auth\
+```\
+\
+## 2. Set Up PostgreSQL Database\
+\
+### Fastest Option: Railway.app\
+\
+1. Go to [railway.app](https://railway.app)\
+2. Sign up (free account)\
+3. Click "New Project" \uc0\u8594  Add "PostgreSQL"\
+4. Copy the `DATABASE_URL` from the PostgreSQL card\
+5. Paste into `.env.local`\
+\
+**Takes 2 minutes!**\
+\
+### Alternative: Local PostgreSQL\
+\
+```bash\
+brew install postgresql@15\
+brew services start postgresql@15\
+createdb snapbrand\
+```\
+\
+Then set in `.env.local`:\
+```bash\
+DATABASE_URL=postgresql://localhost:5432/snapbrand\
+```\
+\
+## 3. Configure Environment Variables\
+\
+Copy template and fill in all values:\
+```bash\
+cp .env.local.example .env.local\
+```\
+\
+Minimum required:\
+```bash\
+# Database\
+DATABASE_URL=postgresql://...\
+\
+# NextAuth\
+NEXTAUTH_SECRET=<run: openssl rand -base64 32>\
+NEXTAUTH_URL=http://localhost:3000\
+\
+# Google OAuth (optional, but recommended)\
+GOOGLE_CLIENT_ID=\
+GOOGLE_CLIENT_SECRET=\
+\
+# Stripe, OpenAI, Vercel Blob (if using generation features)\
+...\
+```\
+\
+## 4. Set Up Database Tables\
+\
+Push Prisma schema to your database:\
+```bash\
+npx prisma db push\
+```\
+\
+This creates all tables automatically!\
+\
+## 5. (Optional) Set Up Google OAuth\
+\
+1. Go to [Google Cloud Console](https://console.cloud.google.com)\
+2. Create new project\
+3. Enable Google+ API\
+4. Create OAuth credentials:\
+   - Type: Web application\
+   - Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`\
+5. Copy Client ID and Secret to `.env.local`\
+\
+## 6. Run the App\
+\
+```bash\
+npm run dev\
+```\
+\
+Visit `http://localhost:3000`\
+\
+## 7. Test Everything\
+\
+### Email/Password Login\
+- Click "Sign Up"\
+- Enter any email and password\
+- Demo password: `password123` (shown on login page)\
+\
+### View Database\
+```bash\
+npx prisma studio\
+```\
+\
+Opens UI at `http://localhost:5555` - see all your users and assets!\
+\
+### Test Generation (if you add your keys)\
+- Add `OPENAI_API_KEY` and `BLOB_READ_WRITE_TOKEN`\
+- Go to dashboard\
+- Try generating a brand asset\
+\
+## Migration to Production\
+\
+When deploying to Vercel:\
+\
+1. Add environment variables in Vercel dashboard\
+2. Vercel will auto-run migrations\
+3. Update Stripe webhooks to production URL\
+4. Update Google OAuth redirect URIs\
+\
+See [PRISMA_SETUP.md](./PRISMA_SETUP.md) for detailed production guide.\
+\
+## Database Schema\
+\
+The app creates these tables automatically:\
+\
+- **User** - User accounts and Pro membership status\
+- **Account** - OAuth provider accounts\
+- **Session** - NextAuth sessions\
+- **GeneratedAsset** - User's generated brand assets\
+- **VerificationToken** - Email verification tokens\
+\
+View/edit with: `npx prisma studio`\
+\
+## Troubleshooting\
+\
+### "Can't reach database server"\
+- Check DATABASE_URL is correct\
+- Verify database is running\
+- Test connection: `psql YOUR_DATABASE_URL`\
+\
+### "Prisma client not generated"\
+```bash\
+npx prisma generate\
+```\
+\
+### "Migration failed"\
+```bash\
+# Reset database (deletes all data)\
+npx prisma migrate reset\
+```\
+\
+### "NextAuth not working"\
+- Set `NEXTAUTH_SECRET`\
+- Set `NEXTAUTH_URL` correctly\
+- Restart dev server\
+\
+## Next Steps\
+\
+1. \uc0\u9989  Database set up\
+2. \uc0\u9989  Local development working\
+3. \uc0\u55357 \u56541  Add Stripe webhook secret\
+4. \uc0\u55357 \u56541  Add OpenAI API key\
+5. \uc0\u55357 \u56960  Deploy to Vercel\
+\
+## Useful Commands\
+\
+```bash\
+# View database UI\
+npx prisma studio\
+\
+# Reset database\
+npx prisma migrate reset\
+\
+# Check schema\
+npx prisma schema validate\
+\
+# Generate client after schema changes\
+npx prisma generate\
+```\
+\
+## Need Help?\
+\
+- [Prisma Docs](https://www.prisma.io/docs)\
+- [NextAuth Docs](https://next-auth.js.org)\
+- [Railway Docs](https://docs.railway.app)\
+}

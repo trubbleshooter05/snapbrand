@@ -1,0 +1,403 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 # SnapBrand \'97 Weekend MVP Implementation Plan\
+\
+## The One-Liner\
+**Upload a product photo or describe your business \uc0\u8594  AI generates a complete brand kit (logo concepts, color palette, typography, social templates, ad mockups) \u8594  paywall for downloads/exports.**\
+\
+---\
+\
+## Pre-Build: Friday Night (1-2 hours)\
+\
+### Step 1: Keyword Validation\
+Before you buy a domain or write a line of code, validate demand. This is your movieslike.app pattern \'97 keyword data first, build second.\
+\
+**Pull from Keywords Everywhere or Ahrefs:**\
+- "AI brand kit generator"\
+- "AI logo generator"\
+- "brand identity generator"\
+- "AI branding tool"\
+- "free brand kit maker"\
+- "brand kit for [vertical]" \'97 restaurants, Etsy sellers, coaches, real estate agents, fitness trainers, photographers, podcasters\
+\
+**What you're looking for:**\
+- Easy/Medium KD keywords with 500+ monthly volume\
+- Long-tail verticals with zero competition (these become your programmatic SEO pages)\
+- Validate that people are actively searching for this category, not just adjacent tools like Canva\
+\
+**Also check:**\
+- Product Hunt: search "brand kit" and "brand generator" \'97 see what's been launched, what got traction, what's dead\
+- Existing competitors: Looka, Brandmark, Hatchful (Shopify) \'97 all exist but none do the full kit with AI generation AND programmatic SEO pages per vertical\
+\
+### Step 2: Domain Decision\
+Based on keyword data, pick a domain. Options to consider:\
+- `snapbrand.ai` or `snapbrand.co` \'97 branded, memorable\
+- `brandkit.ai` \'97 keyword-rich, SEO-friendly\
+- `makemybrand.ai` \'97 action-oriented\
+\
+**Rule: Don't buy until keyword data confirms demand.** If the data looks weak, pivot the concept before spending $12 on a domain.\
+\
+---\
+\
+## Phase 1: Scaffold (Saturday Morning, 2-3 hours)\
+\
+### Step 3: Claude Code \'97 Init the Project\
+\
+Open terminal, create the project:\
+\
+```bash\
+claude-code "Create a Next.js 14 app with:\
+- App router\
+- Supabase auth (Google OAuth + email/password)\
+- Stripe integration ($9.99/mo Pro plan, 3 free generations for unauthed users)\
+- Tailwind CSS\
+- OpenAI SDK\
+- Vercel Blob for asset storage\
+- Basic layout: header with logo, main content area, footer\
+- Environment variables template for SUPABASE_URL, SUPABASE_ANON_KEY, STRIPE_SECRET_KEY, STRIPE_PRICE_ID, OPENAI_API_KEY, BLOB_READ_WRITE_TOKEN"\
+```\
+\
+### Step 4: Supabase Setup\
+\
+In Supabase dashboard:\
+1. Create new project: `snapbrand`\
+2. Enable Google OAuth provider\
+3. Create tables:\
+\
+```sql\
+-- Brand kits generated\
+create table brand_kits (\
+  id uuid default gen_random_uuid() primary key,\
+  user_id uuid references auth.users,\
+  business_name text not null,\
+  business_type text, -- "restaurant", "coaching", "ecommerce", etc.\
+  description text,\
+  generated_data jsonb, -- full AI output (colors, fonts, taglines, etc.)\
+  hero_image_url text, -- uploaded product photo if any\
+  created_at timestamptz default now()\
+);\
+\
+-- Track generations for free tier limiting\
+create table generations (\
+  id uuid default gen_random_uuid() primary key,\
+  user_id uuid references auth.users,\
+  session_id text, -- for anonymous users\
+  created_at timestamptz default now()\
+);\
+\
+-- Enable RLS\
+alter table brand_kits enable row level security;\
+alter table generations enable row level security;\
+```\
+\
+### Step 5: Stripe Setup\
+\
+In Stripe dashboard:\
+1. Create product: "SnapBrand Pro"\
+2. Create price: $9.99/month recurring\
+3. Set up webhook endpoint: `/api/webhooks/stripe`\
+4. Events to listen for: `checkout.session.completed`, `customer.subscription.deleted`\
+\
+You've done this exact flow with CardSnap ($9.99/mo) \'97 same pattern, copy the webhook handler logic.\
+\
+---\
+\
+## Phase 2: Core Product Flow (Saturday Afternoon, 3-4 hours)\
+\
+### Step 6: The Input Page (Landing Page IS the Product)\
+\
+Like Photo AI \'97 the landing page IS the conversion tool. No separate "app" page. User lands, sees the tool, uses it.\
+\
+```\
+Claude Code prompt:\
+"Build the homepage with:\
+1. H1: 'Generate Your Complete Brand Kit in 60 Seconds'\
+2. Subtitle: 'AI-powered brand identity for your business. Logo concepts, colors, typography, social templates \'97 no designer needed.'\
+3. Input form with:\
+   - Business name (required)\
+   - Business type dropdown: Restaurant, E-commerce, Coaching, Real Estate, Fitness, Photography, Podcast, SaaS, Agency, Other\
+   - One-line description (required, placeholder: 'Artisan coffee roastery in Brooklyn')\
+   - Optional: upload product photo or logo inspiration\
+   - Style preference: Modern & Clean, Bold & Playful, Luxury & Elegant, Warm & Organic, Tech & Minimal\
+4. Big CTA button: '\uc0\u10024  Generate My Brand Kit'\
+5. Below: '3 free generations \'97 no sign up required'\
+6. Social proof: counter showing total kits generated"\
+```\
+\
+### Step 7: The AI Generation Engine \'97 `/api/generate`\
+\
+This is the core. One API route that calls OpenAI and returns a structured brand kit.\
+\
+```\
+Claude Code prompt:\
+"Create /api/generate route that:\
+1. Accepts: businessName, businessType, description, stylePreference, optional imageUrl\
+2. Calls OpenAI GPT-4o with a structured output prompt that returns JSON:\
+   - brand_name_options: 3 variations/taglines\
+   - color_palette: primary, secondary, accent, background, text (hex codes + names)\
+   - typography: heading font (Google Fonts), body font, size scale\
+   - tagline_options: 3 tagline suggestions\
+   - brand_voice: 2-3 sentence brand voice description\
+   - logo_concepts: 3 text descriptions of logo concepts (we'll generate images separately)\
+   - social_templates: descriptions for Instagram post, story, LinkedIn banner\
+3. Then calls DALL-E 3 to generate:\
+   - 1 logo concept image (simple, icon-style, on white background)\
+   - 1 social media mockup\
+4. Stores images to Vercel Blob\
+5. Saves full result to Supabase brand_kits table\
+6. Returns the complete kit JSON to frontend\
+7. Rate limit: check generations table \'97 max 3 per session/user without auth, unlimited for Pro"\
+```\
+\
+**The OpenAI prompt is everything.** Here's the system prompt structure:\
+\
+```\
+You are an expert brand strategist and designer. Given a business description, generate a complete brand identity system. Return ONLY valid JSON.\
+\
+The brand kit must be cohesive \'97 colors, typography, and voice should all tell the same story. Think about:\
+- What emotions should this brand evoke?\
+- Who is the target customer?\
+- What differentiates this from competitors in the same vertical?\
+\
+Be specific with hex codes, Google Font names, and actionable descriptions.\
+```\
+\
+### Step 8: The Results Page \'97 `/results/[id]`\
+\
+Shareable results page (same pattern as CardSnap's `/results/[id]`).\
+\
+```\
+Claude Code prompt:\
+"Create a results page at /results/[id] that:\
+1. Fetches brand kit data from Supabase by ID\
+2. Displays the full brand kit in beautiful cards:\
+   - Color Palette: actual color swatches with hex codes, copy-on-click\
+   - Typography: live preview using Google Fonts embed\
+   - Logo Concept: DALL-E generated image\
+   - Taglines: 3 options displayed\
+   - Brand Voice: description card\
+   - Social Template: mockup preview\
+3. Download section (gated for Pro):\
+   - 'Download Brand Kit PDF' button\
+   - 'Download Color Palette' button\
+   - 'Download Logo (PNG)' button\
+   - If not Pro: clicking shows auth modal \uc0\u8594  Stripe checkout\
+4. Share button: copy link to clipboard\
+5. 'Generate Another' CTA at bottom\
+6. Meta tags for social sharing (OG image = the logo concept)"\
+```\
+\
+---\
+\
+## Phase 3: Programmatic SEO (Saturday Evening, 2-3 hours)\
+\
+This is the Levels + Schneider play. This is where the money is.\
+\
+### Step 9: Vertical Landing Pages\
+\
+Create programmatic pages for every business type. Same pattern as movieslike.app's "movies like [X]" pages and Photo AI's photo pack pages.\
+\
+```\
+Claude Code prompt:\
+"Create a dynamic route at /brand-kit/[vertical]/page.tsx that:\
+1. Has a verticals data file with 30+ entries, each containing:\
+   - slug: 'restaurant', 'real-estate-agent', 'fitness-coach', etc.\
+   - title: 'AI Brand Kit for Restaurants'\
+   - h1: 'Create Your Restaurant Brand Identity in 60 Seconds'\
+   - description: SEO-optimized description for this vertical\
+   - specific_prompts: example descriptions for this vertical\
+   - pain_points: why this vertical needs branding help\
+   - example_colors: suggested palette for the vertical\
+2. Each page renders:\
+   - Unique H1 targeting '[vertical] brand kit' keyword\
+   - 3-4 paragraphs of vertical-specific content (generated once via OpenAI, stored in data file)\
+   - The same generate form, pre-filled with the business type\
+   - Example brand kit preview for that vertical\
+   - FAQ section (3-5 Q&As specific to that vertical)\
+3. Generates proper meta tags, title, description for each vertical\
+4. Add all verticals to sitemap.xml"\
+```\
+\
+**Target verticals (start with 30, expand to 100+):**\
+\
+Tier 1 (high volume): restaurant, real estate agent, personal trainer, life coach, photographer, podcast, e-commerce store, beauty salon, law firm, dental practice\
+\
+Tier 2 (medium volume): coffee shop, yoga studio, tattoo shop, wedding planner, dog groomer, barber shop, nail salon, florist, bakery, food truck\
+\
+Tier 3 (long tail, zero competition): mobile detailing, pressure washing, junk removal, notary public, tutoring service, bookkeeper, virtual assistant, pet sitter, handyman, cleaning service\
+\
+### Step 10: Comparison Pages\
+\
+Steal Levels' comparison page strategy directly.\
+\
+```\
+Claude Code prompt:\
+"Create comparison pages at /compare/[slug]:\
+- snapbrand-vs-looka\
+- snapbrand-vs-canva\
+- snapbrand-vs-fiverr-logo\
+- snapbrand-vs-99designs\
+- snapbrand-vs-brandmark\
+Each page has: feature comparison table, pricing comparison, 'Why SnapBrand' section, CTA to generate"\
+```\
+\
+### Step 11: Sitemap + Indexation\
+\
+```\
+Claude Code prompt:\
+"Create a dynamic sitemap.xml that includes:\
+- Homepage\
+- All /brand-kit/[vertical] pages\
+- All /compare/[slug] pages\
+- /pricing page\
+- Auto-updates when new verticals are added\
+Also create robots.txt allowing all crawlers"\
+```\
+\
+---\
+\
+## Phase 4: Monetization & Polish (Sunday Morning, 2-3 hours)\
+\
+### Step 12: Pricing Page\
+\
+```\
+Claude Code prompt:\
+"Create /pricing page with two tiers:\
+- Free: 3 brand kit generations, watermarked downloads, basic color palette\
+- Pro ($9.99/mo): Unlimited generations, high-res downloads, PDF export, logo PNG, social templates, priority generation\
+Use Stripe checkout for Pro. Show a comparison table."\
+```\
+\
+### Step 13: AdSense Slots\
+\
+Since this is a portfolio/monetization play, wire up AdSense slots like movieslike.app:\
+- Above-the-fold leaderboard on vertical pages\
+- In-content rectangle on results pages\
+- Sidebar on comparison pages\
+\
+```\
+Claude Code prompt:\
+"Add Google AdSense ad slot components:\
+- LeaderboardAd (728x90) for top of vertical pages\
+- RectangleAd (300x250) for results page sidebar\
+- Use next/script for the AdSense tag\
+- Placeholder divs that show 'Ad' text in development"\
+```\
+\
+### Step 14: Analytics & Tracking\
+\
+```\
+Claude Code prompt:\
+"Add:\
+- Google Analytics 4 (gtag.js via next/script)\
+- Track events: generate_kit, download_kit, signup, upgrade_to_pro\
+- Vercel Analytics (built-in)\
+- Simple counter: increment 'total_kits_generated' in Supabase on each generation for social proof"\
+```\
+\
+---\
+\
+## Phase 5: Ship & Distribute (Sunday Afternoon, 1-2 hours)\
+\
+### Step 15: Deploy to Vercel\
+\
+```bash\
+vercel --prod\
+```\
+\
+Add custom domain, set environment variables, verify Stripe webhooks point to production URL.\
+\
+### Step 16: Submit to Google Search Console\
+\
+1. Add property in GSC\
+2. Submit sitemap.xml\
+3. Request indexing for homepage and top 5 vertical pages manually\
+\
+### Step 17: Distribution Plays (Schneider's Playbook)\
+\
+**Week 1 launches:**\
+- Submit to Product Hunt (prep a 1-liner, 3 screenshots, maker comment)\
+- Post to r/smallbusiness: "I built a free AI tool that generates brand kits for small businesses"\
+- Post to r/Entrepreneur: value-add post about branding mistakes, mention tool\
+- Post to r/SideProject\
+- IndieHackers: "Show IH" post with revenue goal\
+\
+**Ongoing (automate later with your OpenClaw/trigger_watcher stack):**\
+- Reddit monitoring: watch for "need logo", "branding help", "brand identity" posts \uc0\u8594  draft responses mentioning the tool\
+- Generate 5 new vertical pages per week (use OpenAI to write the vertical-specific content)\
+- Twitter/X: share interesting brand kits generated (with permission), build-in-public MRR updates\
+\
+---\
+\
+## Architecture Summary\
+\
+```\
+\uc0\u9484 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9488 \
+\uc0\u9474               FRONTEND                    \u9474 \
+\uc0\u9474   Next.js 14 (App Router)                \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  / (homepage = generate tool)       \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  /results/[id] (shareable kit)      \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  /brand-kit/[vertical] (SEO pages)  \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  /compare/[slug] (vs competitors)   \u9474 \
+\uc0\u9474   \u9492 \u9472 \u9472  /pricing                           \u9474 \
+\uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 \
+\uc0\u9474               API ROUTES                  \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  /api/generate (OpenAI + DALL-E)    \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  /api/webhooks/stripe               \u9474 \
+\uc0\u9474   \u9492 \u9472 \u9472  /api/download (gated export)       \u9474 \
+\uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 \
+\uc0\u9474               BACKEND                     \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  Supabase (auth, DB, RLS)           \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  Stripe ($9.99/mo Pro)              \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  OpenAI (GPT-4o + DALL-E 3)        \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  Vercel Blob (image storage)        \u9474 \
+\uc0\u9474   \u9492 \u9472 \u9472  Google AdSense (display ads)       \u9474 \
+\uc0\u9500 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9508 \
+\uc0\u9474               DISTRIBUTION                \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  30+ programmatic SEO pages         \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  5+ comparison pages                \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  Reddit distribution                \u9474 \
+\uc0\u9474   \u9500 \u9472 \u9472  Product Hunt launch                \u9474 \
+\uc0\u9474   \u9492 \u9472 \u9472  Build-in-public on X               \u9474 \
+\uc0\u9492 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9496 \
+```\
+\
+## Cost Estimate (Monthly at Scale)\
+\
+| Item | Cost |\
+|------|------|\
+| Vercel Pro | $20/mo |\
+| Supabase Free Tier | $0 |\
+| OpenAI (GPT-4o + DALL-E) | ~$0.15/generation \uc0\u8594  $15/mo at 100 gens |\
+| Vercel Blob | ~$0 (free tier covers early stage) |\
+| Stripe fees | 2.9% + 30\'a2 per transaction |\
+| Domain | $12/yr |\
+| **Total at 100 users/mo** | **~$40/mo** |\
+\
+## Revenue Targets\
+\
+| Milestone | Revenue | Timeline |\
+|-----------|---------|----------|\
+| Launch weekend | $0 (free tier validation) | Day 0 |\
+| First AdSense revenue | ~$50-100/mo | Month 1-2 (need 1K+ pageviews/day) |\
+| First 10 Pro subscribers | $99.90/mo | Month 2-3 |\
+| 50K sessions/mo (Mediavine eligible) | $500-1K/mo ads | Month 4-6 |\
+| 100 Pro subscribers | $999/mo | Month 6-12 |\
+\
+## Weekend Timeline Summary\
+\
+| When | What | Hours |\
+|------|------|-------|\
+| Friday Night | Keyword validation, domain purchase, Supabase/Stripe setup | 1-2h |\
+| Saturday AM | Claude Code scaffold, auth, payments, basic layout | 2-3h |\
+| Saturday PM | Core generate flow, results page, AI prompt engineering | 3-4h |\
+| Saturday Eve | Programmatic SEO pages (30 verticals), comparison pages, sitemap | 2-3h |\
+| Sunday AM | Pricing page, AdSense slots, analytics, polish | 2-3h |\
+| Sunday PM | Deploy, GSC submit, Product Hunt prep, Reddit posts | 1-2h |\
+| **Total** | **Weekend MVP shipped** | **~14h** |\
+}

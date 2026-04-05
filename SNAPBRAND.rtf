@@ -1,0 +1,93 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 # SnapBrand \'97 AI Brand Kit Generator\
+\
+## What This Is\
+AI-powered brand identity generator. User describes their business \uc0\u8594  AI generates a complete brand kit (logo concept, color palette, typography, taglines, brand voice, social templates). Free tier (3 generations) + Pro ($9.99/mo unlimited + high-res downloads).\
+\
+## Tech Stack\
+- **Framework:** Next.js 14 (App Router)\
+- **Auth:** Supabase Auth (Google OAuth + email/password)\
+- **Database:** Supabase (Postgres + RLS)\
+- **Payments:** Stripe (subscription, $9.99/mo Pro plan)\
+- **AI:** OpenAI GPT-4o (structured brand data) + DALL-E 3 (logo concepts)\
+- **Storage:** Vercel Blob (generated images)\
+- **Hosting:** Vercel\
+- **Styling:** Tailwind CSS\
+- **Ads:** Google AdSense slots on SEO pages\
+\
+## Project Structure\
+```\
+app/\
+  page.tsx                    # Homepage = the generate tool (landing page IS the product)\
+  results/[id]/page.tsx       # Shareable brand kit results page\
+  brand-kit/[vertical]/page.tsx  # Programmatic SEO pages (30+ verticals)\
+  compare/[slug]/page.tsx     # Competitor comparison pages\
+  pricing/page.tsx            # Pricing page (Free vs Pro)\
+  api/\
+    generate/route.ts         # Core AI generation endpoint\
+    download/route.ts         # Gated download endpoint (Pro only)\
+    webhooks/stripe/route.ts  # Stripe webhook handler\
+lib/\
+  supabase.ts                 # Supabase client\
+  stripe.ts                   # Stripe helpers\
+  openai.ts                   # OpenAI client + prompts\
+  verticals.ts                # Vertical data for programmatic SEO pages\
+  auth.ts                     # Auth helpers\
+components/\
+  GenerateForm.tsx             # Business input form\
+  BrandKitDisplay.tsx          # Renders the full brand kit\
+  ColorPalette.tsx             # Color swatch display with copy-on-click\
+  TypographyPreview.tsx        # Live Google Fonts preview\
+  PricingCard.tsx              # Pricing tier cards\
+  AdSlot.tsx                   # Google AdSense wrapper\
+  Header.tsx\
+  Footer.tsx\
+```\
+\
+## Core User Flow\
+1. User lands on homepage \uc0\u8594  sees generate form\
+2. Enters: business name, type (dropdown), description, style preference\
+3. Optionally uploads a product photo or logo inspiration\
+4. Clicks "Generate My Brand Kit"\
+5. /api/generate calls GPT-4o for structured JSON + DALL-E 3 for logo image\
+6. Results saved to Supabase, images to Vercel Blob\
+7. Redirected to /results/[id] \'97 shareable page\
+8. Free users: can view everything, downloads are watermarked\
+9. Pro users: high-res downloads, PDF export, unlimited generations\
+\
+## Rate Limiting\
+- Anonymous users: 3 generations per browser session (tracked via cookie + Supabase)\
+- Authenticated free users: 3 generations total\
+- Pro subscribers: unlimited\
+\
+## Important Rules\
+- Homepage IS the product \'97 no separate "app" or "dashboard" page\
+- Every /brand-kit/[vertical] page must have unique H1, meta title, meta description\
+- Every page must include the generate form (pre-filled with vertical if on vertical page)\
+- Results pages must have proper OG meta tags for social sharing\
+- Use Google Fonts embed for typography previews (load dynamically based on AI output)\
+- Color palette must show hex codes with copy-on-click functionality\
+- All Stripe webhooks must verify signatures\
+- Supabase RLS must be enabled on all tables\
+- AdSense slots: leaderboard (728x90) on vertical pages, rectangle (300x250) on results\
+\
+## Environment Variables Needed\
+```\
+NEXT_PUBLIC_SUPABASE_URL=\
+NEXT_PUBLIC_SUPABASE_ANON_KEY=\
+SUPABASE_SERVICE_ROLE_KEY=\
+STRIPE_SECRET_KEY=\
+STRIPE_WEBHOOK_SECRET=\
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=\
+STRIPE_PRICE_ID=\
+OPENAI_API_KEY=\
+BLOB_READ_WRITE_TOKEN=\
+NEXT_PUBLIC_GA_ID=\
+```\
+}
