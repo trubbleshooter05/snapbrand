@@ -12,12 +12,19 @@ interface UserData {
   isProMember: boolean
 }
 
+interface ColorEntry { hex: string; name: string; usage: string }
+
 interface Asset {
   id: string
   brandName: string
   assetType: string
   imageUrl: string
+  logoSvg: string | null
+  wordmarkSvg: string | null
   createdAt: string
+  brandKitData: {
+    color_palette?: Record<string, ColorEntry>
+  } | null
 }
 
 const ASSET_TYPES = ['Logo', 'Color Palette', 'Complete Brand Package'] as const
@@ -302,31 +309,55 @@ export default function DashboardPage() {
         </h2>
         <div className="grid md:grid-cols-3 gap-6">
           {assets.length > 0 ? (
-            assets.map((asset) => (
-              <Link
-                key={asset.id}
-                href={`/brand-kit/${asset.id}`}
-                className="block border border-white/10 rounded-xl overflow-hidden bg-slate-900/60 hover:border-indigo-500/50 transition-all duration-300 group"
-              >
-                <div className="relative w-full aspect-square bg-white">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={asset.imageUrl}
-                    alt={asset.brandName}
-                    className="w-full h-full object-contain p-3"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-white group-hover:text-indigo-300 transition-colors">{asset.brandName}</h3>
-                  <p className="text-sm text-gray-400">{asset.assetType}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {new Date(asset.createdAt).toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-indigo-400 mt-3">View brand kit →</p>
-                </div>
-              </Link>
-            ))
+            assets.map((asset) => {
+              const palette = asset.brandKitData?.color_palette
+              const paletteColors = palette ? Object.values(palette) : []
+              const primaryHex = paletteColors[0]?.hex ?? '#4F46E5'
+              return (
+                <Link
+                  key={asset.id}
+                  href={`/brand-kit/${asset.id}`}
+                  className="block border border-white/10 rounded-2xl overflow-hidden bg-slate-900/60 hover:border-indigo-500/50 transition-all duration-300 group"
+                >
+                  {/* Color bar */}
+                  <div className="flex h-2">
+                    {paletteColors.length > 0
+                      ? paletteColors.map((c, i) => (
+                          <div key={i} className="flex-1" style={{ backgroundColor: c.hex }} />
+                        ))
+                      : <div className="flex-1 bg-indigo-600" />}
+                  </div>
+
+                  {/* SVG monogram + info */}
+                  <div className="p-5 flex items-center gap-4">
+                    <div
+                      className="w-14 h-14 shrink-0 rounded-xl overflow-hidden"
+                      style={{ background: primaryHex }}
+                    >
+                      {asset.logoSvg ? (
+                        <div
+                          className="w-full h-full"
+                          dangerouslySetInnerHTML={{ __html: asset.logoSvg }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-white font-bold text-xl">
+                          {asset.brandName.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-white truncate group-hover:text-indigo-300 transition-colors">
+                        {asset.brandName}
+                      </p>
+                      <p className="text-sm text-gray-400">{asset.assetType}</p>
+                      <p className="text-xs text-gray-600 mt-0.5">
+                        {new Date(asset.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              )
+            })
           ) : (
             <div className="col-span-full min-h-[200px] border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center text-gray-500 bg-slate-900/40">
               <p>No assets generated yet</p>

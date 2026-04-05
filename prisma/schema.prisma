@@ -70,16 +70,20 @@ model VerificationToken {
 // App-specific models
 model GeneratedAsset {
   id            String   @id @default(cuid())
-  userId        String
+  userId        String?                          // null for anonymous generations
+  guestToken    String?                          // cookie-based id for anonymous users
   brandName     String
-  assetType     String   // "Logo", "Color Palette", "Complete Brand Package"
-  imageUrl      String
+  assetType     String
+  imageUrl      String   @default("")            // kept for backward compat; empty for SVG-only gens
+  logoSvg       String?  @db.Text               // programmatic SVG monogram
+  wordmarkSvg   String?  @db.Text               // programmatic SVG wordmark
   promptUsed    String   @db.Text
-  brandKitData  Json?    // Structured GPT-4o brand kit output
+  brandKitData  Json?                            // Structured GPT-4o brand kit output
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
+  @@index([guestToken])
 }

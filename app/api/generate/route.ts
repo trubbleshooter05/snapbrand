@@ -3,18 +3,21 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { OpenAI } from 'openai'
-import { put } from '@vercel/blob'
+import { generateLogoSVG, generateWordmarkSVG } from '@/lib/generate-logo-svg'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
-// ─── Structured brand kit type ────────────────────────────────────────────────
+const FREE_LIMIT = 3
+const GUEST_COOKIE = 'sb_guest_token'
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 export interface BrandKitData {
   brand_strategy: {
-    positioning: string
-    target_audience: string
-    brand_personality: string[]
-    tone_of_voice: string
-    unique_value_prop: string
+    positioning:        string
+    target_audience:    string
+    brand_personality:  string[]
+    tone_of_voice:      string
+    unique_value_prop:  string
   }
   color_palette: {
     primary:    { hex: string; name: string; usage: string }
@@ -35,11 +38,17 @@ export interface BrandKitData {
     personality: string
     sample_copy: string
   }
-  logo_concepts: string[]
-  logo_image_prompt: string // DALL-E prompt produced by GPT-4o, no text
+  logo_concepts:      string[]
+  logo_image_prompt:  string
+  logo_monogram: {
+    letter: string
+    shape:  'circle' | 'rounded-square' | 'hexagon' | 'diamond'
+    style:  string
+  }
 }
 
-const BRAND_KIT_SYSTEM_PROMPT = `You are an expert brand strategist and creative director.
+// ─── System prompt ────────────────────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are an expert brand strategist and creative director.
 Generate a complete, creative brand kit based on the business info provided.
 Return ONLY valid JSON — no markdown, no explanation, no backticks.
 
@@ -72,142 +81,150 @@ JSON shape:
     "sample_copy": "One sample marketing sentence in brand voice"
   },
   "logo_concepts": [
-    "Concept 1: visual description for designer",
-    "Concept 2: visual description for designer",
-    "Concept 3: visual description for designer"
+    "Concept 1: visual description for a designer",
+    "Concept 2: visual description for a designer",
+    "Concept 3: visual description for a designer"
   ],
-  "logo_image_prompt": "Detailed DALL-E prompt for a logo ICON. Must produce: professional icon, clean vector-style, no text, no words, no letters, symbol only."
+  "logo_image_prompt": "Unused placeholder",
+  "logo_monogram": {
+    "letter": "First 1-2 letters of brand name, uppercase",
+    "shape": "one of: circle, rounded-square, hexagon, diamond",
+    "style": "modern"
+  }
 }`
 
-// No-text DALL-E prompt wrapper
-function buildDallePrompt(basePrompt: string, brandName: string): string {
-  return `${basePrompt}
-
-CRITICAL REQUIREMENTS — strictly enforce all of these:
-- Do NOT include ANY text, letters, words, numbers, or typography anywhere in the image.
-- No brand name "${brandName}", no tagline, no labels, no captions.
-- Pure icon/symbol only. Abstract or illustrative mark.
-- Clean white or very light neutral background.
-- Modern, minimal, professional vector-style flat design.
-- Suitable for use as an app icon or logo mark.`
-}
-
 export async function POST(request: NextRequest) {
-  try {
-    if (!process.env.OPENAI_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
+    return NextResponse.json(
+      { error: 'OPENAI_API_KEY is not configured.' },
+      { status: 500 }
+    )
+  }
+
+  const { brandName, brandDescription, assetType } = await request.json().catch(() => ({}))
+
+  if (!brandName || !brandDescription) {
+    return NextResponse.json(
+      { error: 'brandName and brandDescription are required.' },
+      { status: 400 }
+    )
+  }
+
+  // ── Auth / rate-limit check ────────────────────────────────────────────────
+  const session = await getServerSession(authOptions)
+  let userId: string | null = null
+  let guestToken: string | null = null
+  let newGuestToken = false
+
+  if (session?.user?.id) {
+    // Authenticated user
+    userId = session.user.id
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    if (!user.isProMember && user.generationsUsed >= FREE_LIMIT) {
       return NextResponse.json(
-        { error: 'OPENAI_API_KEY is not set. Add it to .env.local.' },
-        { status: 500 }
-      )
-    }
-
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { brandName, brandDescription, assetType } = await request.json()
-
-    if (!brandName || !brandDescription) {
-      return NextResponse.json(
-        { error: 'Missing required fields: brandName and brandDescription' },
-        { status: 400 }
-      )
-    }
-
-    // Check user limits
-    const user = await prisma.user.findUnique({ where: { id: session.user.id } })
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-    if (!user.isProMember && user.generationsUsed >= 3) {
-      return NextResponse.json(
-        { error: 'Generation limit reached. Upgrade to Pro.' },
+        { error: 'Generation limit reached. Upgrade to Pro for unlimited generations.' },
         { status: 403 }
       )
     }
-
-    // ── Step 1: GPT-4o → structured brand kit JSON ────────────────────────────
-    const userPrompt = `Business name: ${brandName}
-Asset type requested: ${assetType}
-Description: ${brandDescription}`
-
-    const kitResponse = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        { role: 'system', content: BRAND_KIT_SYSTEM_PROMPT },
-        { role: 'user',   content: userPrompt },
-      ],
-      temperature: 0.8,
-      max_tokens: 2000,
-      response_format: { type: 'json_object' },
+  } else {
+    // Anonymous user — rate-limit by cookie-stored guest token
+    guestToken = request.cookies.get(GUEST_COOKIE)?.value ?? null
+    if (!guestToken) {
+      guestToken = crypto.randomUUID()
+      newGuestToken = true
+    }
+    const anonCount = await prisma.generatedAsset.count({
+      where: { guestToken, userId: null },
     })
-
-    let brandKit: BrandKitData
-    try {
-      brandKit = JSON.parse(kitResponse.choices[0].message.content ?? '{}') as BrandKitData
-    } catch {
+    if (anonCount >= FREE_LIMIT) {
       return NextResponse.json(
-        { error: 'GPT-4o returned invalid JSON. Please try again.' },
-        { status: 500 }
+        { error: 'You have used your 3 free generations. Sign up to keep going!' },
+        { status: 403 }
       )
     }
+  }
 
-    // ── Step 2: DALL-E 3 → text-free logo icon ───────────────────────────────
-    const dallePrompt = buildDallePrompt(
-      brandKit.logo_image_prompt ?? `Professional logo icon for a brand called "${brandName}". ${brandDescription}`,
-      brandName
-    )
-
-    const imageResponse = await openai.images.generate({
-      model: 'dall-e-3',
-      prompt: dallePrompt,
-      n: 1,
-      size: '1024x1024',
-    })
-
-    const openAiUrl = imageResponse.data?.[0]?.url
-    if (!openAiUrl) {
-      return NextResponse.json({ error: 'DALL-E returned no image URL.' }, { status: 500 })
-    }
-
-    // ── Step 3: Persist image (Blob in prod, OpenAI URL in dev) ──────────────
-    let persistedUrl = openAiUrl
-
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      try {
-        const imgBuffer = await fetch(openAiUrl).then((r) => r.arrayBuffer())
-        const filename = `${brandName.toLowerCase().replace(/\s+/g, '-')}-${String(assetType).toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.png`
-        const blob = await put(filename, imgBuffer, {
-          access: 'public',
-          token: process.env.BLOB_READ_WRITE_TOKEN,
-        })
-        persistedUrl = blob.url
-      } catch (blobErr) {
-        console.error('Blob upload failed, falling back to OpenAI URL:', blobErr)
-      }
-    }
-
-    // ── Step 4: Save to DB ────────────────────────────────────────────────────
-    const asset = await prisma.generatedAsset.create({
-      data: {
-        userId:       session.user.id,
-        brandName,
-        assetType,
-        imageUrl:     persistedUrl,
-        promptUsed:   dallePrompt,
-        brandKitData: brandKit as object,
+  // ── Step 1: GPT-4o structured brand kit ────────────────────────────────────
+  const kitResponse = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      {
+        role: 'user',
+        content: `Business name: ${brandName}\nAsset type: ${assetType ?? 'Brand Kit'}\nDescription: ${brandDescription}`,
       },
-    })
+    ],
+    temperature: 0.8,
+    max_tokens: 2000,
+    response_format: { type: 'json_object' },
+  })
 
+  let kit: BrandKitData
+  try {
+    kit = JSON.parse(kitResponse.choices[0].message.content ?? '{}') as BrandKitData
+  } catch {
+    return NextResponse.json(
+      { error: 'GPT-4o returned invalid JSON. Please try again.' },
+      { status: 500 }
+    )
+  }
+
+  // ── Step 2: Programmatic SVG logo (no DALL-E) ──────────────────────────────
+  const monogram = kit.logo_monogram ?? {}
+  const primaryHex    = kit.color_palette?.primary?.hex    ?? '#4F46E5'
+  const secondaryHex  = kit.color_palette?.secondary?.hex  ?? '#7C3AED'
+  const headingFont   = kit.typography?.heading_font        ?? 'Inter'
+
+  const logoSvg = generateLogoSVG({
+    letter:          monogram.letter ?? brandName.charAt(0),
+    primaryColor:    primaryHex,
+    secondaryColor:  secondaryHex,
+    backgroundColor: '#FFFFFF',
+    shape:           (['circle', 'rounded-square', 'hexagon', 'diamond'].includes(monogram.shape)
+                       ? monogram.shape
+                       : 'rounded-square') as 'circle' | 'rounded-square' | 'hexagon' | 'diamond',
+    fontFamily:      headingFont,
+  })
+
+  const wordmarkSvg = generateWordmarkSVG({
+    brandName,
+    primaryColor: primaryHex,
+    fontFamily:   headingFont,
+  })
+
+  // ── Step 3: Save to DB ─────────────────────────────────────────────────────
+  const asset = await prisma.generatedAsset.create({
+    data: {
+      userId,
+      guestToken,
+      brandName,
+      assetType:    assetType ?? 'Brand Kit',
+      imageUrl:     '',
+      logoSvg,
+      wordmarkSvg,
+      promptUsed:   SYSTEM_PROMPT.slice(0, 200), // store a short ref
+      brandKitData: kit as object,
+    },
+  })
+
+  // Increment generation count for authenticated users
+  if (userId) {
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: userId },
       data:  { generationsUsed: { increment: 1 } },
     })
-
-    return NextResponse.json({ asset, message: 'Asset generated successfully' })
-  } catch (error) {
-    console.error('Generation error:', error)
-    return NextResponse.json({ error: 'Failed to generate asset' }, { status: 500 })
   }
+
+  // ── Build response, set guest cookie if new ────────────────────────────────
+  const res = NextResponse.json({ asset, message: 'Brand kit generated successfully' })
+  if (newGuestToken && guestToken) {
+    res.cookies.set(GUEST_COOKIE, guestToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge:   60 * 60 * 24 * 365, // 1 year
+      path:     '/',
+    })
+  }
+  return res
 }

@@ -2,11 +2,19 @@
 
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { motion, type BezierDefinition } from 'framer-motion'
 
 export const dynamic = 'force-dynamic'
 
 const EASE: BezierDefinition = [0.22, 1, 0.36, 1]
+
+const BUSINESS_TYPES = [
+  '', 'SaaS / Software', 'E-commerce', 'Restaurant',
+  'Fitness / Coaching', 'Real Estate', 'Agency',
+  'Healthcare', 'Creator / Influencer', 'Other',
+]
 
 const FEATURES = [
   {
@@ -37,17 +45,56 @@ const PRO_FEATURES = [
 
 export default function Home() {
   const { data: session } = useSession()
-  const generationsUsed =
-    ((session?.user as unknown) as { generationsUsed?: number })?.generationsUsed ?? 0
+  const router = useRouter()
   const isProMember =
     ((session?.user as unknown) as { isProMember?: boolean })?.isProMember ?? false
-  const generationsRemaining = Math.max(0, 3 - generationsUsed)
+
+  const [brandName, setBrandName] = useState('')
+  const [description, setDescription] = useState('')
+  const [businessType, setBusinessType] = useState('')
+  const [generating, setGenerating] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+
+  const handleGenerate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormError(null)
+    if (!brandName.trim() || !description.trim()) {
+      setFormError('Please enter a brand name and description.')
+      return
+    }
+    setGenerating(true)
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandName: brandName.trim(),
+          brandDescription: `${businessType ? businessType + ': ' : ''}${description.trim()}`,
+          assetType: 'Brand Kit',
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        if (res.status === 403) {
+          setFormError(data.error ?? 'Free limit reached. Sign up to continue!')
+        } else {
+          setFormError(data.error ?? 'Something went wrong. Please try again.')
+        }
+        return
+      }
+      router.push(`/brand-kit/${data.asset.id}`)
+    } catch {
+      setFormError('Network error. Please try again.')
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-4 pt-28 pb-24 text-center">
+      {/* ── Hero + Generate form ───────────────────────────────────────────── */}
+      <section className="max-w-3xl mx-auto px-4 pt-24 pb-20 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -61,41 +108,105 @@ export default function Home() {
             <span className="text-indigo-400">in seconds</span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-            Create stunning brand assets with AI. Logos, color palettes, and complete brand
-            packages — instantly.
+            Get a complete brand kit — logo, colors, fonts, taglines, and brand voice — instantly.
+          </p>
+        </motion.div>
+
+        {/* ── Generate form (no auth required) ─────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6, ease: EASE }}
+          className="bg-slate-900/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-8 text-left"
+        >
+          <form onSubmit={handleGenerate} className="space-y-4">
+            {formError && (
+              <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl text-sm">
+                {formError}
+                {formError.toLowerCase().includes('sign up') && (
+                  <Link href="/auth/signup" className="ml-2 underline text-indigo-400 hover:text-indigo-300">
+                    Sign up free →
+                  </Link>
+                )}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Brand Name
+              </label>
+              <input
+                type="text"
+                value={brandName}
+                onChange={(e) => setBrandName(e.target.value)}
+                placeholder="e.g. FitFlow, Luminary, Nova Eats"
+                required
+                disabled={generating}
+                className="w-full px-4 py-3 border border-white/15 rounded-xl bg-white text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Business Type
+              </label>
+              <select
+                value={businessType}
+                onChange={(e) => setBusinessType(e.target.value)}
+                disabled={generating}
+                className="w-full px-4 py-3 border border-white/15 rounded-xl bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+              >
+                {BUSINESS_TYPES.map((t) => (
+                  <option key={t} value={t}>{t || 'Select business type (optional)'}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Describe your brand
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe your business, target audience, and style preferences…"
+                rows={3}
+                required
+                disabled={generating}
+                className="w-full px-4 py-3 border border-white/15 rounded-xl bg-white text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={generating}
+              className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-bold text-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {generating ? (
+                <span className="animate-pulse">✨ Generating your brand kit…</span>
+              ) : (
+                '✨ Generate My Brand Kit — Free'
+              )}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-600 mt-4">
+            No signup required · 3 free generations · Takes ~15 seconds
           </p>
 
-          {session ? (
-            <div className="flex justify-center gap-4 flex-wrap">
-              <Link
-                href="/dashboard"
-                className="px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-semibold transition-all duration-300"
-              >
-                Go to Dashboard
-              </Link>
-              {!isProMember && (
-                <Link
-                  href="/pricing"
-                  className="px-8 py-3.5 bg-white/10 hover:bg-white/15 border border-white/10 text-white rounded-xl font-semibold transition-all duration-300"
-                >
-                  Upgrade to Pro →
+          {session && (
+            <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+              <p className="text-sm text-gray-500">Logged in as {session.user?.email}</p>
+              <div className="flex gap-3">
+                <Link href="/dashboard" className="text-sm text-indigo-400 hover:text-indigo-300">
+                  Dashboard →
                 </Link>
-              )}
-            </div>
-          ) : (
-            <div className="flex justify-center gap-4 flex-wrap">
-              <Link
-                href="/auth/signup"
-                className="px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-semibold transition-all duration-300"
-              >
-                Get Started Free
-              </Link>
-              <Link
-                href="/auth/login"
-                className="px-8 py-3.5 bg-white/10 hover:bg-white/15 border border-white/10 text-white rounded-xl font-semibold transition-all duration-300"
-              >
-                Sign In
-              </Link>
+                {!isProMember && (
+                  <Link href="/pricing" className="text-sm text-gray-400 hover:text-white">
+                    Upgrade to Pro
+                  </Link>
+                )}
+              </div>
             </div>
           )}
         </motion.div>

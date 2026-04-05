@@ -1,59 +1,42 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import type { BrandKitData } from '@/app/api/generate/route'
 
 interface Asset {
   id: string
   brandName: string
   assetType: string
-  imageUrl: string
+  logoSvg: string | null
+  wordmarkSvg: string | null
   createdAt: string
   brandKitData: BrandKitData | null
 }
 
-const EASE = [0.22, 1, 0.36, 1] as const
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function CopyButton({ text, label }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false)
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: EASE }}
-      className="rounded-2xl p-6 bg-slate-900/80 backdrop-blur-2xl border border-white/10"
+    <button
+      onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500) }}
+      className="text-xs text-gray-400 hover:text-indigo-400 transition-colors"
     >
-      <h3 className="text-xs font-semibold tracking-widest text-indigo-400 uppercase mb-4">
-        {title}
-      </h3>
-      {children}
-    </motion.div>
+      {copied ? '✓ copied' : (label ?? 'copy')}
+    </button>
   )
 }
 
-function CopyHex({ hex }: { hex: string }) {
-  const [copied, setCopied] = useState(false)
-  const copy = () => {
-    navigator.clipboard.writeText(hex)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
-  }
+function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <button
-      onClick={copy}
-      title="Click to copy"
-      className="text-xs text-gray-500 hover:text-indigo-400 transition-colors font-mono"
-    >
-      {copied ? '✓ copied' : hex}
-    </button>
+    <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-5">
+      {children}
+    </h2>
   )
 }
 
 export default function BrandKitPage() {
   const { id } = useParams<{ id: string }>()
-  const router = useRouter()
   const [asset, setAsset] = useState<Asset | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -61,11 +44,8 @@ export default function BrandKitPage() {
   useEffect(() => {
     if (!id) return
     fetch(`/api/brand-kit/${id}`)
-      .then((r) => {
-        if (!r.ok) throw new Error('Could not load brand kit')
-        return r.json()
-      })
-      .then((data: Asset) => setAsset(data))
+      .then((r) => { if (!r.ok) throw new Error('Brand kit not found'); return r.json() })
+      .then((d: Asset) => setAsset(d))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
   }, [id])
@@ -73,270 +53,285 @@ export default function BrandKitPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-950">
-        <p className="text-gray-400 animate-pulse">Loading brand kit…</p>
+        <p className="text-gray-400 animate-pulse">Building your brand kit…</p>
       </div>
     )
   }
-
   if (error || !asset) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gray-950">
-        <p className="text-red-400">{error ?? 'Brand kit not found.'}</p>
-        <Link href="/dashboard" className="text-indigo-400 hover:text-indigo-300">
-          ← Back to Dashboard
-        </Link>
+        <p className="text-red-400">{error ?? 'Not found.'}</p>
+        <Link href="/" className="text-indigo-400 hover:text-indigo-300">← Back</Link>
       </div>
     )
   }
 
   const kit = asset.brandKitData
+  const heading = kit?.typography?.heading_font
+  const body    = kit?.typography?.body_font
+  const primary = kit?.color_palette?.primary?.hex ?? '#4F46E5'
+  const colors  = kit?.color_palette ? Object.entries(kit.color_palette) : []
 
-  // Load Google Fonts if typography data exists
-  const headingFont = kit?.typography?.heading_font
-  const bodyFont    = kit?.typography?.body_font
-  const googleFontsUrl =
-    headingFont || bodyFont
-      ? `https://fonts.googleapis.com/css2?${[
-          headingFont && `family=${encodeURIComponent(headingFont)}:wght@400;700`,
-          bodyFont    && `family=${encodeURIComponent(bodyFont)}:wght@400;700`,
-        ]
-          .filter(Boolean)
-          .join('&')}&display=swap`
-      : null
+  const googleFontsUrl = [heading, body].filter(Boolean).length
+    ? `https://fonts.googleapis.com/css2?${[
+        heading && `family=${encodeURIComponent(heading)}:wght@400;700`,
+        body    && `family=${encodeURIComponent(body)}:wght@400;700`,
+      ].filter(Boolean).join('&')}&display=swap`
+    : null
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {googleFontsUrl && (
-        // eslint-disable-next-line @next/next/no-page-custom-font
-        <link href={googleFontsUrl} rel="stylesheet" />
-      )}
+      {googleFontsUrl && <link href={googleFontsUrl} rel="stylesheet" />}
 
-      <div className="max-w-5xl mx-auto px-4 py-16 space-y-8">
+      <div className="max-w-4xl mx-auto px-6 py-12 space-y-16">
 
-        {/* ── Back link ──────────────────────────────────────────────────── */}
-        <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
-          ← Dashboard
+        {/* ── Back ──────────────────────────────────────────────────────────── */}
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-white transition-colors">
+          ← Generate another
         </Link>
 
-        {/* ── Header ─────────────────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: EASE }}
-        >
-          <p className="text-sm font-semibold tracking-widest text-indigo-400 uppercase mb-2">
-            Brand Kit
-          </p>
+        {/* ── Hero header ───────────────────────────────────────────────────── */}
+        <div className="text-center space-y-3">
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Brand Identity System</p>
           <h1
-            className="text-4xl md:text-5xl font-bold text-white"
-            style={{ fontFamily: headingFont ?? undefined }}
+            className="text-5xl font-black text-white"
+            style={{ fontFamily: heading ? `'${heading}', sans-serif` : undefined }}
           >
             {asset.brandName}
           </h1>
-          {kit?.brand_voice?.sample_copy && (
+          {kit?.tagline_options?.[0] && (
             <p
-              className="text-gray-400 mt-2 text-lg max-w-2xl"
-              style={{ fontFamily: bodyFont ?? undefined }}
+              className="text-xl text-gray-400"
+              style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}
             >
-              {kit.brand_voice.sample_copy}
+              {kit.tagline_options[0]}
             </p>
-          )}
-        </motion.div>
-
-        {/* ── Logo icon + taglines grid ───────────────────────────────────── */}
-        <div className="grid md:grid-cols-2 gap-6">
-
-          {/* Logo image */}
-          <Section title="Logo Icon">
-            <div className="rounded-xl overflow-hidden bg-white aspect-square flex items-center justify-center">
-              <img
-                src={asset.imageUrl}
-                alt={`${asset.brandName} logo icon`}
-                className="w-full h-full object-contain p-4"
-                loading="lazy"
-              />
-            </div>
-            <p className="text-xs text-gray-500 mt-3">
-              Icon only — no text in the image. Brand name rendered as HTML below.
-            </p>
-            <h2
-              className="text-2xl font-bold text-white mt-3"
-              style={{ fontFamily: headingFont ?? undefined }}
-            >
-              {asset.brandName}
-            </h2>
-            {kit?.tagline_options?.[0] && (
-              <p
-                className="text-gray-400 text-sm"
-                style={{ fontFamily: bodyFont ?? undefined }}
-              >
-                {kit.tagline_options[0]}
-              </p>
-            )}
-          </Section>
-
-          {/* Taglines */}
-          {kit?.tagline_options && (
-            <Section title="Tagline Options">
-              <div className="space-y-3">
-                {kit.tagline_options.map((t, i) => (
-                  <div
-                    key={i}
-                    className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-indigo-500/40 transition-colors cursor-pointer"
-                    onClick={() => navigator.clipboard.writeText(t)}
-                    title="Click to copy"
-                  >
-                    <p
-                      className="text-white font-medium"
-                      style={{ fontFamily: bodyFont ?? undefined }}
-                    >
-                      &ldquo;{t}&rdquo;
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-gray-600 mt-3">Click any tagline to copy</p>
-            </Section>
           )}
         </div>
 
-        {/* ── Color palette ───────────────────────────────────────────────── */}
-        {kit?.color_palette && (
-          <Section title="Color Palette">
-            <div className="flex flex-wrap gap-4">
-              {Object.entries(kit.color_palette).map(([role, color]) => (
-                <div key={role} className="text-center">
+        {/* ── Logo mark ─────────────────────────────────────────────────────── */}
+        {(asset.logoSvg || asset.wordmarkSvg) && (
+          <section>
+            <SectionLabel>Logo Mark</SectionLabel>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              {/* Light background */}
+              <div className="bg-white rounded-2xl p-12 flex items-center justify-center">
+                {asset.logoSvg && (
                   <div
-                    className="w-20 h-20 rounded-xl border border-white/10 cursor-pointer hover:scale-105 transition-transform shadow-lg"
+                    className="w-40 h-40"
+                    dangerouslySetInnerHTML={{ __html: asset.logoSvg }}
+                  />
+                )}
+              </div>
+              {/* Dark background */}
+              <div className="bg-gray-900 border border-white/10 rounded-2xl p-12 flex items-center justify-center">
+                {asset.logoSvg && (
+                  <div
+                    className="w-40 h-40"
+                    dangerouslySetInnerHTML={{ __html: asset.logoSvg }}
+                  />
+                )}
+              </div>
+            </div>
+            {/* Wordmark */}
+            {asset.wordmarkSvg && (
+              <div className="bg-white rounded-2xl p-8 flex items-center justify-center overflow-x-auto">
+                <div dangerouslySetInnerHTML={{ __html: asset.wordmarkSvg }} />
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* ── Color palette ─────────────────────────────────────────────────── */}
+        {colors.length > 0 && (
+          <section>
+            <SectionLabel>Color Palette</SectionLabel>
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+              {colors.map(([role, color]) => (
+                <div key={role} className="group text-center">
+                  <div
+                    className="aspect-square rounded-2xl border border-white/10 group-hover:scale-105 transition-transform shadow-lg cursor-pointer mb-3"
                     style={{ backgroundColor: color.hex }}
                     onClick={() => navigator.clipboard.writeText(color.hex)}
-                    title={`Click to copy ${color.hex}`}
+                    title="Click to copy hex"
                   />
-                  <p className="text-sm font-semibold text-white mt-2">{color.name}</p>
-                  <CopyHex hex={color.hex} />
-                  <p className="text-xs text-gray-500 capitalize">{role}</p>
+                  <p className="text-sm font-bold text-white capitalize">{role}</p>
+                  <p className="text-xs text-gray-400">{color.name}</p>
+                  <CopyButton text={color.hex} label={color.hex} />
                 </div>
               ))}
             </div>
-          </Section>
+          </section>
         )}
 
-        {/* ── Typography ──────────────────────────────────────────────────── */}
+        {/* ── Typography ────────────────────────────────────────────────────── */}
         {kit?.typography && (
-          <Section title="Typography">
-            <div className="space-y-6">
-              <div>
-                <p className="text-xs text-gray-500 mb-1 uppercase tracking-widest">Heading — {headingFont}</p>
-                <p
-                  className="text-3xl font-bold text-white"
-                  style={{ fontFamily: headingFont ?? undefined }}
-                >
+          <section>
+            <SectionLabel>Typography</SectionLabel>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-2xl p-8">
+                <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-4">Heading — {heading}</p>
+                <p className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: heading ? `'${heading}', sans-serif` : undefined }}>
+                  {heading}
+                </p>
+                <p className="text-2xl text-gray-700" style={{ fontFamily: heading ? `'${heading}', sans-serif` : undefined }}>
+                  Aa Bb Cc Dd Ee Ff Gg
+                </p>
+                <p className="text-base text-gray-500 mt-2" style={{ fontFamily: heading ? `'${heading}', sans-serif` : undefined }}>
                   The quick brown fox jumps over the lazy dog
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1 uppercase tracking-widest">Body — {bodyFont}</p>
-                <p
-                  className="text-base text-gray-300 leading-relaxed"
-                  style={{ fontFamily: bodyFont ?? undefined }}
-                >
-                  The quick brown fox jumps over the lazy dog.<br />
-                  ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789
+              <div className="bg-white rounded-2xl p-8">
+                <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-4">Body — {body}</p>
+                <p className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}>
+                  {body}
+                </p>
+                <p className="text-2xl text-gray-700" style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}>
+                  Aa Bb Cc Dd Ee Ff Gg
+                </p>
+                <p className="text-base text-gray-500 mt-2" style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}>
+                  The quick brown fox jumps over the lazy dog
                 </p>
               </div>
             </div>
-          </Section>
+          </section>
         )}
 
-        {/* ── Brand strategy + voice ──────────────────────────────────────── */}
+        {/* ── Taglines ──────────────────────────────────────────────────────── */}
+        {kit?.tagline_options && kit.tagline_options.length > 0 && (
+          <section>
+            <SectionLabel>Tagline Options</SectionLabel>
+            <div className="space-y-3">
+              {kit.tagline_options.map((t, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between bg-slate-900/80 border border-white/10 rounded-xl p-5 hover:border-white/30 transition-colors cursor-pointer group"
+                  onClick={() => navigator.clipboard.writeText(t)}
+                >
+                  <p
+                    className="text-lg font-medium text-white"
+                    style={{ fontFamily: heading ? `'${heading}', sans-serif` : undefined }}
+                  >
+                    &ldquo;{t}&rdquo;
+                  </p>
+                  <span className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity ml-4 shrink-0">
+                    click to copy
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Brand voice ───────────────────────────────────────────────────── */}
+        {kit?.brand_voice && (
+          <section>
+            <SectionLabel>Brand Voice</SectionLabel>
+            <div className="bg-slate-900/80 border border-white/10 rounded-2xl p-8 space-y-6">
+              <div>
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Tone</p>
+                <p className="text-lg font-medium text-white">{kit.brand_voice.tone}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Personality</p>
+                <p className="text-gray-300" style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}>
+                  {kit.brand_voice.personality}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Example Copy</p>
+                <div
+                  className="rounded-xl p-6 border-l-4 bg-white/5"
+                  style={{ borderColor: primary }}
+                >
+                  <p
+                    className="text-lg italic text-gray-200"
+                    style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}
+                  >
+                    &ldquo;{kit.brand_voice.sample_copy}&rdquo;
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── Brand strategy ────────────────────────────────────────────────── */}
         {kit?.brand_strategy && (
-          <Section title="Brand Strategy">
-            <div className="grid sm:grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Positioning</p>
-                <p className="text-gray-200">{kit.brand_strategy.positioning}</p>
-              </div>
-              <div>
-                <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Target Audience</p>
-                <p className="text-gray-200">{kit.brand_strategy.target_audience}</p>
-              </div>
-              <div>
-                <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Unique Value</p>
-                <p className="text-gray-200">{kit.brand_strategy.unique_value_prop}</p>
-              </div>
-              <div>
-                <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Personality</p>
-                <div className="flex flex-wrap gap-2 mt-1">
+          <section>
+            <SectionLabel>Brand Strategy</SectionLabel>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { label: 'Positioning',      val: kit.brand_strategy.positioning },
+                { label: 'Target Audience',  val: kit.brand_strategy.target_audience },
+                { label: 'Unique Value',     val: kit.brand_strategy.unique_value_prop },
+                { label: 'Tone of Voice',    val: kit.brand_strategy.tone_of_voice },
+              ].map(({ label, val }) => (
+                <div key={label} className="bg-slate-900/80 border border-white/10 rounded-xl p-5">
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-2">{label}</p>
+                  <p className="text-gray-200 text-sm leading-relaxed">{val}</p>
+                </div>
+              ))}
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-5 sm:col-span-2">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-3">Personality</p>
+                <div className="flex flex-wrap gap-2">
                   {kit.brand_strategy.brand_personality.map((t) => (
-                    <span key={t} className="px-2 py-0.5 rounded-full bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs">
+                    <span
+                      key={t}
+                      className="px-3 py-1 rounded-full text-sm font-medium border"
+                      style={{ backgroundColor: `${primary}20`, color: primary, borderColor: `${primary}50` }}
+                    >
                       {t}
                     </span>
                   ))}
                 </div>
               </div>
             </div>
-          </Section>
+          </section>
         )}
 
-        {kit?.brand_voice && (
-          <Section title="Brand Voice">
-            <div className="space-y-3 text-sm">
-              <div>
-                <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Tone</p>
-                <p className="text-gray-200">{kit.brand_voice.tone}</p>
-              </div>
-              <div>
-                <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Personality</p>
-                <p className="text-gray-200">{kit.brand_voice.personality}</p>
-              </div>
-              <div className="mt-4 p-4 rounded-xl bg-white/5 border border-white/10">
-                <p className="text-xs text-gray-500 mb-2 uppercase tracking-widest">Sample Copy</p>
-                <p
-                  className="text-gray-200 italic"
-                  style={{ fontFamily: bodyFont ?? undefined }}
-                >
-                  &ldquo;{kit.brand_voice.sample_copy}&rdquo;
-                </p>
-              </div>
-            </div>
-          </Section>
-        )}
-
-        {/* ── Logo concepts (text, for a designer) ───────────────────────── */}
+        {/* ── Logo concepts ─────────────────────────────────────────────────── */}
         {kit?.logo_concepts && kit.logo_concepts.length > 0 && (
-          <Section title="Logo Concepts (for a designer)">
-            <div className="space-y-3">
+          <section>
+            <SectionLabel>Logo Concept Directions</SectionLabel>
+            <p className="text-sm text-gray-500 mb-4">Hand these to a designer for custom execution:</p>
+            <div className="grid md:grid-cols-3 gap-4">
               {kit.logo_concepts.map((concept, i) => (
-                <div key={i} className="flex gap-3">
-                  <span className="text-indigo-500 font-bold text-sm mt-0.5">{i + 1}.</span>
-                  <p className="text-gray-300 text-sm leading-relaxed">{concept}</p>
+                <div key={i} className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mb-3"
+                    style={{ backgroundColor: primary }}
+                  >
+                    {i + 1}
+                  </div>
+                  <p className="text-sm text-gray-300 leading-relaxed">{concept}</p>
                 </div>
               ))}
             </div>
-          </Section>
+          </section>
         )}
 
-        {/* ── Actions ─────────────────────────────────────────────────────── */}
-        <div className="flex flex-wrap gap-4 pt-4">
-          <a
-            href={asset.imageUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold transition-all"
-          >
-            Download Logo Icon
-          </a>
+        {/* ── CTA ───────────────────────────────────────────────────────────── */}
+        <section className="border-t border-white/10 pt-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link
-            href="/dashboard"
-            className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold transition-all"
+            href="/"
+            className="px-8 py-3 rounded-xl font-bold text-white transition-colors"
+            style={{ backgroundColor: primary }}
           >
-            Generate Another
+            Generate Another Brand Kit
           </Link>
-        </div>
+          <button
+            onClick={() => navigator.clipboard.writeText(window.location.href)}
+            className="text-sm text-gray-400 hover:text-white underline transition-colors"
+          >
+            Copy shareable link
+          </button>
+        </section>
 
-        <p className="text-xs text-gray-600 pb-8">
-          Generated {new Date(asset.createdAt).toLocaleDateString()} · Asset ID: {asset.id}
+        <p className="text-xs text-gray-700 pb-8">
+          Generated {new Date(asset.createdAt).toLocaleDateString()} · Kit ID: {asset.id}
         </p>
+
       </div>
     </div>
   )
