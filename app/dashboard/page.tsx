@@ -96,9 +96,8 @@ export default function DashboardPage() {
         setFormError(typeof data.error === 'string' ? data.error : 'Generation failed. Try again.')
         return
       }
-      setBrandName('')
-      setBrandDescription('')
-      await Promise.all([fetchUserData(), fetchAssets()])
+      // Redirect straight to the rich brand kit results page
+      router.push(`/brand-kit/${data.asset.id}`)
     } catch (err) {
       console.error(err)
       setFormError('Network error. Is the dev server running?')
@@ -304,35 +303,29 @@ export default function DashboardPage() {
         <div className="grid md:grid-cols-3 gap-6">
           {assets.length > 0 ? (
             assets.map((asset) => (
-              <div
+              <Link
                 key={asset.id}
-                className="border border-white/10 rounded-xl overflow-hidden bg-slate-900/60"
+                href={`/brand-kit/${asset.id}`}
+                className="block border border-white/10 rounded-xl overflow-hidden bg-slate-900/60 hover:border-indigo-500/50 transition-all duration-300 group"
               >
-                <div className="relative w-full aspect-square bg-black/40">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- external OpenAI/Blob URLs; avoids remotePatterns churn */}
+                <div className="relative w-full aspect-square bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={asset.imageUrl}
                     alt={asset.brandName}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain p-3"
                     loading="lazy"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-white">{asset.brandName}</h3>
+                  <h3 className="font-semibold text-white group-hover:text-indigo-300 transition-colors">{asset.brandName}</h3>
                   <p className="text-sm text-gray-400">{asset.assetType}</p>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 mt-1">
                     {new Date(asset.createdAt).toLocaleDateString()}
                   </p>
-                  <a
-                    href={asset.imageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-3 text-sm text-indigo-400 hover:text-indigo-300"
-                  >
-                    Open full image →
-                  </a>
+                  <p className="text-sm text-indigo-400 mt-3">View brand kit →</p>
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <div className="col-span-full min-h-[200px] border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center text-gray-500 bg-slate-900/40">

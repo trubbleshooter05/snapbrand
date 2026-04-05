@@ -75,6 +75,7 @@ model GeneratedAsset {
   assetType     String   // "Logo", "Color Palette", "Complete Brand Package"
   imageUrl      String
   promptUsed    String   @db.Text
+  brandKitData  Json?    // Structured GPT-4o brand kit output
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
