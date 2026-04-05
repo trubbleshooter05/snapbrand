@@ -7,23 +7,26 @@ export default function Header() {
   const { data: session } = useSession()
 
   return (
-    <header className="border-b border-gray-200">
+    <header className="border-b border-white/10 bg-gray-950/80 backdrop-blur-xl sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold text-gray-900">
+        <Link
+          href="/"
+          className="text-2xl font-bold bg-gradient-to-r from-indigo-300 via-white to-violet-300 bg-clip-text text-transparent logo-glow tracking-tight"
+        >
           ✨ SNAPBRAND
         </Link>
 
         <nav className="flex items-center gap-6">
           {session ? (
             <>
-              <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
+              <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
                 Dashboard
               </Link>
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">{session.user?.email}</span>
+                <span className="text-sm text-gray-500">{session.user?.email}</span>
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+                  className="px-4 py-2 bg-white/10 border border-white/10 text-white rounded-lg hover:bg-white/15 transition-all"
                 >
                   Logout
                 </button>
@@ -33,13 +36,13 @@ export default function Header() {
             <>
               <Link
                 href="/auth/login"
-                className="text-gray-700 hover:text-gray-900"
+                className="text-gray-400 hover:text-white transition-colors"
               >
                 Login
               </Link>
               <Link
                 href="/auth/signup"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors"
               >
                 Sign Up
               </Link>
