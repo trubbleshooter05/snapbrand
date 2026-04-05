@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,11 +20,18 @@ interface Asset {
   createdAt: string
 }
 
+const ASSET_TYPES = ['Logo', 'Color Palette', 'Complete Brand Package'] as const
+
 export default function DashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [userData, setUserData] = useState<UserData | null>(null)
   const [assets, setAssets] = useState<Asset[]>([])
+  const [brandName, setBrandName] = useState('')
+  const [brandDescription, setBrandDescription] = useState('')
+  const [assetType, setAssetType] = useState<string>(ASSET_TYPES[0])
+  const [generating, setGenerating] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -64,10 +70,47 @@ export default function DashboardPage() {
     }
   }
 
+  const handleGenerate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormError(null)
+    const name = brandName.trim()
+    const desc = brandDescription.trim()
+    if (!name || !desc) {
+      setFormError('Please enter a brand name and description.')
+      return
+    }
+
+    setGenerating(true)
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandName: name,
+          brandDescription: desc,
+          assetType,
+        }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setFormError(typeof data.error === 'string' ? data.error : 'Generation failed. Try again.')
+        return
+      }
+      setBrandName('')
+      setBrandDescription('')
+      await Promise.all([fetchUserData(), fetchAssets()])
+    } catch (err) {
+      console.error(err)
+      setFormError('Network error. Is the dev server running?')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
   if (status === 'loading' || !session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-gray-600">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-950">
+        <div className="text-lg text-gray-400">Loading...</div>
       </div>
     )
   }
@@ -79,60 +122,68 @@ export default function DashboardPage() {
   const canGenerate = isProMember || generationsRemaining > 0
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold text-gray-900 mb-2">
+    <div className="max-w-7xl mx-auto px-4 py-12 text-white">
+      <h1 className="text-4xl font-bold text-white mb-2">
         Welcome back!
       </h1>
-      <p className="text-gray-600 mb-8">
+      <p className="text-gray-400 mb-8">
         Create stunning brand assets with AI
       </p>
 
       {/* Plan Status */}
       <div className="grid md:grid-cols-2 gap-6 mb-12">
-        {/* Free Tier Info */}
         {!isProMember && (
-          <div className="p-6 border border-gray-200 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <div
+            className={[
+              'p-6 rounded-2xl border border-white/10',
+              'bg-slate-900/80 backdrop-blur-2xl',
+            ].join(' ')}
+          >
+            <h2 className="text-xl font-semibold text-white mb-2">
               Free Plan
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-400 mb-4 text-sm">
               You&apos;re using the free plan with limited generations
             </p>
-            <div className="bg-white p-4 rounded-lg mb-4">
+            <div className="bg-white/5 p-4 rounded-xl mb-4 border border-white/10">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-white">
                   {generationsRemaining} / {freeGenerationsLimit} remaining
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-white/10 rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full transition-all"
+                  className="bg-indigo-500 h-2 rounded-full transition-all"
                   style={{
                     width: `${((freeGenerationsLimit - generationsRemaining) / freeGenerationsLimit) * 100}%`,
                   }}
-                ></div>
+                />
               </div>
             </div>
             <Link
               href="/pricing"
-              className="block text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+              className="block text-center px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-semibold"
             >
               Upgrade to Pro
             </Link>
           </div>
         )}
 
-        {/* Pro Tier Info */}
         {isProMember && (
-          <div className="p-6 border-2 border-blue-600 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <div
+            className={[
+              'p-6 rounded-2xl border border-indigo-500/40',
+              'bg-slate-900/80 backdrop-blur-2xl',
+            ].join(' ')}
+          >
+            <h2 className="text-xl font-semibold text-white mb-2">
               Pro Plan
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-400 mb-4 text-sm">
               Unlimited generations and premium features
             </p>
-            <div className="bg-white p-4 rounded-lg">
-              <p className="text-lg font-bold text-blue-600">
+            <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+              <p className="text-lg font-bold text-indigo-300">
                 Unlimited Generations ✨
               </p>
             </div>
@@ -141,104 +192,150 @@ export default function DashboardPage() {
       </div>
 
       {/* Generation Tool */}
-      <div className="bg-white border border-gray-200 rounded-lg p-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+      <div
+        className={[
+          'rounded-2xl p-8 border border-white/10',
+          'bg-slate-900/80 backdrop-blur-2xl',
+        ].join(' ')}
+      >
+        <h2 className="text-2xl font-semibold text-white mb-6">
           Generate Brand Assets
         </h2>
 
         {!canGenerate && !isProMember && (
-          <div className="p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg mb-6">
+          <div className="p-4 bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-xl mb-6 text-sm">
             <p className="font-semibold mb-2">Generation limit reached</p>
-            <p className="text-sm mb-4">
+            <p className="mb-4 text-amber-200/90">
               You&apos;ve used all 3 free generations. Upgrade to Pro to create unlimited assets.
             </p>
             <Link
               href="/pricing"
-              className="inline-block px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-semibold text-sm"
+              className="inline-block px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 font-semibold text-sm"
             >
               Upgrade Now
             </Link>
           </div>
         )}
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleGenerate}>
+          {formError && (
+            <div className="p-4 bg-red-500/10 border border-red-500/40 text-red-200 rounded-xl text-sm">
+              {formError}
+            </div>
+          )}
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="brandName" className="block text-sm font-medium text-gray-300 mb-2">
               Brand Name
             </label>
             <input
+              id="brandName"
               type="text"
+              value={brandName}
+              onChange={(e) => setBrandName(e.target.value)}
               placeholder="Enter your brand name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={!canGenerate || generating}
+              className="w-full px-4 py-2.5 border border-white/15 rounded-xl bg-white text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="brandDescription" className="block text-sm font-medium text-gray-300 mb-2">
               Brand Description
             </label>
             <textarea
+              id="brandDescription"
+              value={brandDescription}
+              onChange={(e) => setBrandDescription(e.target.value)}
               placeholder="Describe your brand, industry, and style preferences"
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            ></textarea>
+              disabled={!canGenerate || generating}
+              className="w-full px-4 py-2.5 border border-white/15 rounded-xl bg-white text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50"
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="assetType" className="block text-sm font-medium text-gray-300 mb-2">
               Asset Type
             </label>
-            <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option>Logo</option>
-              <option>Color Palette</option>
-              <option>Complete Brand Package</option>
+            <select
+              id="assetType"
+              value={assetType}
+              onChange={(e) => setAssetType(e.target.value)}
+              disabled={!canGenerate || generating}
+              className="w-full px-4 py-2.5 border border-white/15 rounded-xl bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50"
+            >
+              {ASSET_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
             </select>
           </div>
 
           <button
             type="submit"
-            disabled={!canGenerate}
-            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!canGenerate || generating}
+            className="w-full px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            {canGenerate ? 'Generate Assets' : 'Upgrade to Generate'}
+            {generating ? 'Generating…' : canGenerate ? 'Generate Assets' : 'Upgrade to Generate'}
           </button>
         </form>
 
-        <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-gray-600">
-            <span className="font-semibold text-blue-900">💡 Tip:</span> Be as specific as possible in your description for better results. Include your industry, target audience, and preferred styles.
+        <div className="mt-8 p-4 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+          <p className="text-sm text-gray-300">
+            <span className="font-semibold text-indigo-300">💡 Tip:</span>{' '}
+            Be as specific as possible in your description for better results. Include your industry,
+            target audience, and preferred styles.
+          </p>
+          <p className="text-xs text-gray-500 mt-3">
+            Local dev needs <code className="text-gray-400">OPENAI_API_KEY</code> in{' '}
+            <code className="text-gray-400">.env.local</code>. Without it, generation returns an error.
+            Optional: <code className="text-gray-400">BLOB_READ_WRITE_TOKEN</code> for permanent image URLs on Vercel Blob.
           </p>
         </div>
       </div>
 
       {/* Generated Assets */}
       <div className="mt-12">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        <h2 className="text-2xl font-semibold text-white mb-6">
           Your Generated Assets
         </h2>
         <div className="grid md:grid-cols-3 gap-6">
           {assets.length > 0 ? (
             assets.map((asset) => (
-              <div key={asset.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                <div className="relative w-full h-48">
-                  <Image
+              <div
+                key={asset.id}
+                className="border border-white/10 rounded-xl overflow-hidden bg-slate-900/60"
+              >
+                <div className="relative w-full aspect-square bg-black/40">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- external OpenAI/Blob URLs; avoids remotePatterns churn */}
+                  <img
                     src={asset.imageUrl}
                     alt={asset.brandName}
-                    fill
-                    className="object-cover"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900">{asset.brandName}</h3>
-                  <p className="text-sm text-gray-600">{asset.assetType}</p>
+                  <h3 className="font-semibold text-white">{asset.brandName}</h3>
+                  <p className="text-sm text-gray-400">{asset.assetType}</p>
                   <p className="text-xs text-gray-500 mt-2">
                     {new Date(asset.createdAt).toLocaleDateString()}
                   </p>
+                  <a
+                    href={asset.imageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-3 text-sm text-indigo-400 hover:text-indigo-300"
+                  >
+                    Open full image →
+                  </a>
                 </div>
               </div>
             ))
           ) : (
-            <div className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-500 col-span-3">
+            <div className="col-span-full min-h-[200px] border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center text-gray-500 bg-slate-900/40">
               <p>No assets generated yet</p>
             </div>
           )}

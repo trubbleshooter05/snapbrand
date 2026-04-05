@@ -17,16 +17,19 @@ export default function Header() {
         </Link>
 
         <nav className="flex items-center gap-6">
+          <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">
+            Pricing
+          </Link>
           {session ? (
             <>
-              <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">
                 Dashboard
               </Link>
               <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-500">{session.user?.email}</span>
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="px-4 py-2 bg-white/10 border border-white/10 text-white rounded-lg hover:bg-white/15 transition-all"
+                  className="px-4 py-2 bg-white/10 border border-white/10 text-white rounded-lg hover:bg-white/15 transition-all text-sm"
                 >
                   Logout
                 </button>
@@ -36,13 +39,13 @@ export default function Header() {
             <>
               <Link
                 href="/auth/login"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 hover:text-white transition-colors text-sm font-medium"
               >
                 Login
               </Link>
               <Link
                 href="/auth/signup"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors text-sm font-medium"
               >
                 Sign Up
               </Link>

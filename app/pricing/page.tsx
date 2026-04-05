@@ -8,22 +8,26 @@ import { motion, AnimatePresence, type Variants, type BezierDefinition } from 'f
 export const dynamic = 'force-dynamic'
 
 // ─── Conic spinning border ───────────────────────────────────────────────────
-// Uses the `animate-spin-slow` keyframe defined in tailwind.config.ts +
-// globals.css (@keyframes spin-slow). The inner div is 200% wide + square so
-// all four corners always cover the parent when rotated.
+// 3px padding gives enough border area to see the gradient at all radii.
+// Inner wrapper uses rounded-[13px] (= 16px - 3px) so corners align exactly.
+// animation is applied via inline style so it directly references the
+// @keyframes spin-slow in globals.css — no Tailwind JIT scanning required.
 function ConicBorder({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative p-[2px] rounded-2xl overflow-hidden">
-      <div className="absolute inset-0 rounded-2xl overflow-hidden">
+    <div className="relative rounded-2xl overflow-hidden" style={{ padding: '3px' }}>
+      {/* Spinning gradient layer — fills the 3px border ring */}
+      <div className="absolute inset-0 overflow-hidden">
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] aspect-square animate-spin-slow"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] aspect-square"
           style={{
-            background:
-              'conic-gradient(from 0deg at 50% 50%, #4F46E5, #7C3AED, #06B6D4, #4F46E5)',
+            background: 'conic-gradient(from 0deg at 50% 50%, #4F46E5, #7C3AED, #06B6D4, #4F46E5)',
+            animation: 'spin-slow 6s linear infinite',
+            willChange: 'transform',
           }}
         />
       </div>
-      <div className="relative rounded-2xl overflow-hidden">{children}</div>
+      {/* Content sits above the gradient; rounded-[13px] matches 16px outer - 3px */}
+      <div className="relative rounded-[13px] overflow-hidden h-full">{children}</div>
     </div>
   )
 }
@@ -123,7 +127,7 @@ export default function PricingPage() {
           <p className="text-sm font-semibold tracking-widest text-indigo-400 uppercase mb-4">
             Pricing
           </p>
-          <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500 mb-5">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-5">
             Simple, Transparent Pricing
           </h1>
           <p className="text-xl text-gray-400 max-w-xl mx-auto">
@@ -134,7 +138,7 @@ export default function PricingPage() {
         {/* ── Bento grid ──────────────────────────────────────────────────── */}
         {/*  Pro column is 1.2fr wide; the card itself is scaled 1.05x         */}
         <AnimatePresence>
-          <div className="grid md:grid-cols-[1fr_1.2fr] gap-6 max-w-4xl mx-auto items-center py-6">
+          <div className="grid md:grid-cols-[1fr_1.2fr] gap-8 max-w-4xl mx-auto items-stretch py-8">
 
             {/* Free card */}
             <motion.div
@@ -144,12 +148,12 @@ export default function PricingPage() {
               animate="visible"
               className={[
                 'group h-full rounded-2xl p-8 flex flex-col',
-                'bg-white/5 backdrop-blur-2xl border border-white/10',
+                'bg-slate-900/80 backdrop-blur-2xl border border-white/10',
                 'transition-all duration-500 hover:border-indigo-500/50',
               ].join(' ')}
             >
               <div className="mb-8">
-                <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-400 mb-1">
+                <h3 className="text-2xl font-bold text-white mb-1">
                   Free
                 </h3>
                 <p className="text-gray-400 text-sm">Perfect for trying SNAPBRAND</p>
@@ -200,13 +204,13 @@ export default function PricingPage() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              className="scale-[1.05] origin-center"
+              className="scale-[1.05] origin-center flex flex-col"
             >
               <ConicBorder>
                 <div
                   className={[
                     'group rounded-2xl p-10 flex flex-col',
-                    'bg-gray-950/90 backdrop-blur-2xl border border-white/5',
+                    'bg-slate-900/80 backdrop-blur-2xl border border-white/10',
                     'transition-all duration-500 hover:border-indigo-500/50',
                   ].join(' ')}
                 >
@@ -287,7 +291,7 @@ export default function PricingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6, ease: EASE }}
         >
-          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500 mb-10 text-center">
+          <h2 className="text-3xl font-bold text-white mb-10 text-center">
             Frequently Asked Questions
           </h2>
           <div className="space-y-4">
@@ -300,7 +304,7 @@ export default function PricingPage() {
                 animate="visible"
                 className={[
                   'rounded-2xl p-6',
-                  'bg-white/5 backdrop-blur-2xl border border-white/10',
+                  'bg-slate-900/80 backdrop-blur-2xl border border-white/10',
                   'transition-all duration-500 hover:border-indigo-500/50',
                 ].join(' ')}
               >

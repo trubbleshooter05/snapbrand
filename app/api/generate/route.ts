@@ -11,6 +11,13 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: 'OPENAI_API_KEY is not set. Add it to .env.local for local dev.' },
+        { status: 500 }
+      )
+    }
+
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
@@ -84,16 +91,30 @@ The prompt should be specific, creative, and suitable for DALL-E 3 or similar im
 
     const imageUrl = imageResponse.data[0].url
 
-    // Download image and upload to Vercel Blob
+    // Download once — we either persist to Vercel Blob (production) or store OpenAI URL (local dev)
     const imageResponse2 = await fetch(imageUrl)
     const buffer = await imageResponse2.arrayBuffer()
 
-    const filename = `${brandName.toLowerCase().replace(/\s+/g, '-')}-${assetType.toLowerCase()}-${Date.now()}.png`
+    const filename = `${brandName.toLowerCase().replace(/\s+/g, '-')}-${String(assetType).toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.png`
 
-    const blobUrl = await put(filename, buffer, {
-      access: 'public',
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-    })
+    let persistedUrl = imageUrl
+
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      try {
+        const blob = await put(filename, buffer, {
+          access: 'public',
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        })
+        persistedUrl = blob.url
+      } catch (blobErr) {
+        console.error('Blob upload failed, using OpenAI URL:', blobErr)
+        persistedUrl = imageUrl
+      }
+    } else {
+      console.warn(
+        '[generate] BLOB_READ_WRITE_TOKEN unset — saving OpenAI CDN URL (short-lived). Add Vercel Blob for permanent URLs.'
+      )
+    }
 
     // Save asset to database
     const asset = await prisma.generatedAsset.create({
@@ -101,7 +122,7 @@ The prompt should be specific, creative, and suitable for DALL-E 3 or similar im
         userId: session.user.id,
         brandName,
         assetType,
-        imageUrl: blobUrl.url,
+        imageUrl: persistedUrl,
         promptUsed: imagePrompt,
       },
     })
