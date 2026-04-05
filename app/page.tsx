@@ -299,7 +299,7 @@ export default function Home() {
               </button>
             ) : (
               <div className="text-center py-2.5 rounded-xl bg-indigo-500/10 text-indigo-300 font-semibold border border-indigo-500/20 text-sm">
-                {generationsRemaining} generations remaining
+                {Math.max(0, 3 - (((session?.user as unknown) as { generationsUsed?: number })?.generationsUsed ?? 0))} generations remaining
               </div>
             )}
           </motion.div>
