@@ -39,3 +39,4 @@ Thumbs.db
 /lib/generated/prisma
 .vercel
 .env*.local
+.claude/
