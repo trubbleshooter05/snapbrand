@@ -1,3 +1,11 @@
+/** Escape text for safe use inside SVG <text> nodes */
+export function escapeSvgText(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
 interface LogoParams {
   letter: string
   primaryColor: string
@@ -35,6 +43,8 @@ export function generateLogoSVG(params: LogoParams): string {
   }
 
   const fontSize = letter.length === 1 ? 180 : letter.length === 2 ? 140 : 100
+  const safeLetter = escapeSvgText(letter.slice(0, 2).toUpperCase())
+  const safeFont = escapeSvgText(fontFamily)
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
   <defs>
@@ -46,12 +56,12 @@ export function generateLogoSVG(params: LogoParams): string {
     y="${center}"
     text-anchor="middle"
     dominant-baseline="central"
-    font-family="'${fontFamily}', Arial, sans-serif"
+    font-family="'${safeFont}', Arial, sans-serif"
     font-weight="700"
     font-size="${fontSize}"
     fill="${backgroundColor}"
     letter-spacing="-2"
-  >${letter.toUpperCase()}</text>
+  >${safeLetter}</text>
 </svg>`
 }
 
@@ -62,6 +72,8 @@ export function generateWordmarkSVG(params: {
 }): string {
   const { brandName, primaryColor, fontFamily } = params
   const width = Math.max(brandName.length * 45, 300)
+  const safeName = escapeSvgText(brandName)
+  const safeFont = escapeSvgText(fontFamily)
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} 80" width="${width}" height="80">
   <defs>
@@ -70,11 +82,11 @@ export function generateWordmarkSVG(params: {
   <text
     x="0"
     y="55"
-    font-family="'${fontFamily}', Arial, sans-serif"
+    font-family="'${safeFont}', Arial, sans-serif"
     font-weight="700"
     font-size="52"
     fill="${primaryColor}"
     letter-spacing="1"
-  >${brandName}</text>
+  >${safeName}</text>
 </svg>`
 }
