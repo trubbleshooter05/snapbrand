@@ -55,9 +55,14 @@ export async function POST(request: NextRequest) {
                 stripeSubscriptionId: subscription.id,
               },
             })
-          } catch (updateError: any) {
+          } catch (updateError: unknown) {
             // Only ignore if user not found (Prisma error P2025)
-            if (updateError.code === 'P2025') {
+            const isP2025 =
+              updateError !== null &&
+              typeof updateError === 'object' &&
+              'code' in updateError &&
+              (updateError as { code: unknown }).code === 'P2025'
+            if (isP2025) {
               console.info(`User not found for email: ${email} - will be created on signup`)
             } else {
               console.error(`Failed to update user subscription for email ${email}:`, updateError)
@@ -80,9 +85,14 @@ export async function POST(request: NextRequest) {
               where: { email: deletedEmail },
               data: { isProMember: false },
             })
-          } catch (updateError: any) {
+          } catch (updateError: unknown) {
             // Only ignore if user not found (Prisma error P2025)
-            if (updateError.code === 'P2025') {
+            const isP2025 =
+              updateError !== null &&
+              typeof updateError === 'object' &&
+              'code' in updateError &&
+              (updateError as { code: unknown }).code === 'P2025'
+            if (isP2025) {
               console.info(`User not found for email: ${deletedEmail}`)
             } else {
               console.error(`Failed to update user subscription status for email ${deletedEmail}:`, updateError)
