@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma migrate deploy && prisma generate && next build",
+    "build": "prisma generate && prisma db push && next build",
+    "db:migrate": "prisma migrate deploy",
+    "db:baseline": "prisma migrate resolve --applied 20260405215947_add_brand_kit_data && prisma migrate resolve --applied 20260405232435_svg_logo_anon_users",
     "start": "next start",
     "lint": "next lint"
   },
