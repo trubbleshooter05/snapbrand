@@ -132,7 +132,7 @@ export default function ClientPage({ businessType }: { businessType: string }) {
               {generating ? (
                 <span className="animate-pulse">✨ Creating Your Logo…</span>
               ) : (
-                '✨ Generate My Logo — Free'
+                config.ctaFormSubmit ?? '✨ Generate My Logo — Free'
               )}
             </button>
           </form>
@@ -318,7 +318,8 @@ export default function ClientPage({ businessType }: { businessType: string }) {
             Ready to Build Your {config.label} Brand?
           </h2>
           <p className="text-gray-400 mb-8 max-w-md mx-auto">
-            Get a professional logo and complete brand kit in seconds. 3 free generations, no credit card required.
+            {config.ctaSectionBlurb ??
+              'Get a professional logo and complete brand kit in seconds. 3 free generations, no credit card required.'}
           </p>
           <Link
             href="#"
@@ -328,7 +329,7 @@ export default function ClientPage({ businessType }: { businessType: string }) {
             }}
             className="inline-block px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-semibold transition-all duration-300"
           >
-            Generate My Logo Now
+            {config.ctaBottom ?? 'Generate My Logo Now'}
           </Link>
         </motion.div>
       </section>
@@ -343,6 +344,14 @@ export default function ClientPage({ businessType }: { businessType: string }) {
               <li><Link href="/logo-generator/restaurant" className="hover:text-indigo-400">Restaurant</Link></li>
               <li><Link href="/logo-generator/ecommerce" className="hover:text-indigo-400">E-commerce</Link></li>
               <li><Link href="/logo-generator/fitness-coach" className="hover:text-indigo-400">Fitness Coach</Link></li>
+              <li><Link href="/logo-generator/saas" className="hover:text-indigo-400">SaaS</Link></li>
+              <li><Link href="/logo-generator/digital-agency" className="hover:text-indigo-400">Digital Agency</Link></li>
+              <li><Link href="/logo-generator/consulting" className="hover:text-indigo-400">Consulting</Link></li>
+              <li><Link href="/logo-generator/startup" className="hover:text-indigo-400">Startup</Link></li>
+              <li><Link href="/logo-generator/online-course" className="hover:text-indigo-400">Online Course</Link></li>
+              <li><Link href="/logo-generator/life-coach" className="hover:text-indigo-400">Life Coach</Link></li>
+              <li><Link href="/logo-generator/photography" className="hover:text-indigo-400">Photography</Link></li>
+              <li><Link href="/logo-generator/beauty-salon" className="hover:text-indigo-400">Beauty Salon</Link></li>
             </ul>
           </div>
           <div>
