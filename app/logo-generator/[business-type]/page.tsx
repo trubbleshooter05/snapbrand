@@ -1,4 +1,4 @@
-import type { Metadata, ResolvingMetadata } from 'next'
+import type { Metadata } from 'next'
 import ClientPage from './client-page'
 import { getConfig } from './config'
 
@@ -6,10 +6,7 @@ interface Props {
   params: Promise<{ 'business-type': string }>
 }
 
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata,
-): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const businessType = (await params)['business-type']
   const config = getConfig(businessType)
 
