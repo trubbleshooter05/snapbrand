@@ -20,6 +20,9 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "SNAPBRAND - AI-Powered Brand Generation",
   description: "Generate beautiful brand assets with AI. Create logos, colors, and more.",
+  verification: {
+    google: "EdP7De48YXoMCUbFmJu9PoxdBlBof-HSUxlZTYVnjiQ",
+  },
 };
 
 export default function RootLayout({
