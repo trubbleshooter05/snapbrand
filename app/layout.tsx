@@ -17,9 +17,35 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://snapbrand-snowy.vercel.app"
+).replace(/\/$/, "");
+
 export const metadata: Metadata = {
-  title: "SNAPBRAND - AI-Powered Brand Generation",
-  description: "Generate beautiful brand assets with AI. Create logos, colors, and more.",
+  metadataBase: new URL(siteUrl),
+  title:
+    "SnapBrand — AI Brand Kit Generator | Create Your Brand in 60 Seconds",
+  description:
+    "Generate a complete brand identity with AI. Logo, color palette, typography, taglines, and brand voice — in 60 seconds. Free to try, no signup required.",
+  keywords: [
+    "AI brand kit",
+    "brand generator",
+    "logo generator",
+    "brand identity",
+    "AI logo",
+    "color palette",
+    "typography",
+    "SnapBrand",
+  ],
+  openGraph: {
+    title:
+      "SnapBrand — AI Brand Kit Generator | Create Your Brand in 60 Seconds",
+    description:
+      "Generate a complete brand identity with AI. Logo, color palette, typography, taglines, and brand voice — in 60 seconds. Free to try, no signup required.",
+    url: `${siteUrl}/`,
+    siteName: "SnapBrand",
+    type: "website",
+  },
   verification: {
     google: "EdP7De48YXoMCUbFmJu9PoxdBlBof-HSUxlZTYVnjiQ",
   },

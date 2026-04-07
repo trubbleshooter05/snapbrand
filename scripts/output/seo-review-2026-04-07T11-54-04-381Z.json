@@ -1,0 +1,358 @@
+{
+  "generatedAt": "2026-04-07T11:54:04.382Z",
+  "input": [
+    "saas",
+    "consulting",
+    "startup",
+    "photography",
+    "beauty-salon"
+  ],
+  "note": "Review-only output. Merge into app/logo-generator/[business-type]/config.ts manually after editing.",
+  "entries": {
+    "saas": {
+      "slug": "saas",
+      "label": "SaaS",
+      "keyword": "saas logo generator",
+      "seoTitle": "SaaS Logo Generator — B2B Software Marks That Convert | SNAPBRAND",
+      "seoDescription": "Launch a credible B2B brand: AI SaaS logos for signup flows, pricing pages, and product UI. Win trials and demos—start free, upgrade for vectors and commercial use.",
+      "description": "Position your product as enterprise-ready before the first sales call—your logo belongs on the homepage, changelog, and investor deck.",
+      "benefits": [
+        {
+          "icon": "🚀",
+          "title": "Funnel Credibility",
+          "desc": "Visitors judge trust in seconds. A sharp mark signals a serious product—not a side project."
+        },
+        {
+          "icon": "🧩",
+          "title": "PLG-Ready",
+          "desc": "Cohesive visuals across marketing site, app shell, and docs so the brand feels intentional end to end."
+        },
+        {
+          "icon": "📈",
+          "title": "Deck & Board-Ready",
+          "desc": "Present a unified story for fundraising and hiring; iterate fast when positioning shifts."
+        },
+        {
+          "icon": "⚡",
+          "title": "Ship This Sprint",
+          "desc": "No agency queue—generate directions in minutes and pick what fits your category."
+        }
+      ],
+      "faqItems": [
+        {
+          "q": "Will it read enterprise vs. playful?",
+          "a": "Describe your ICP and tone. We bias toward trustworthy, modern B2B unless you ask for bold consumer energy."
+        },
+        {
+          "q": "Can I use it in-product and in ads?",
+          "a": "Free is for trying personally. Pro unlocks commercial use across site, ads, and product surfaces—see plan terms."
+        },
+        {
+          "q": "Dark mode / app icon friendly?",
+          "a": "Mention light vs. dark UI in your brief for better contrast. Pro adds formats suited to icons and favicons."
+        },
+        {
+          "q": "What if we rebrand after a pivot?",
+          "a": "Regenerate anytime; Pro supports unlimited exploration as messaging evolves."
+        },
+        {
+          "q": "How fast?",
+          "a": "Typically under a minute from submit to downloadable assets."
+        }
+      ],
+      "relatedTypes": [
+        {
+          "slug": "startup",
+          "label": "Startup"
+        },
+        {
+          "slug": "online-course",
+          "label": "Online Course"
+        },
+        {
+          "slug": "life-coach",
+          "label": "Life Coach"
+        }
+      ],
+      "ctaFormSubmit": "✨ Generate My SaaS Logo — Free",
+      "ctaBottom": "Ship my B2B brand kit",
+      "ctaSectionBlurb": "Put a confident mark on your site, deck, and product chrome—three free generations, then scale with Pro."
+    },
+    "consulting": {
+      "slug": "consulting",
+      "label": "Consulting",
+      "keyword": "consulting logo generator",
+      "seoTitle": "Consulting Logo Generator — Trusted Advisor Branding for Firms & Solos | SNAPBRAND",
+      "seoDescription": "Win higher retainers: executive consulting logos for proposals, LinkedIn, and keynotes. Look established before the discovery call—start free.",
+      "description": "Signal expertise and stability—your logo should feel at home on SOWs, capability decks, and conference slides.",
+      "benefits": [
+        {
+          "icon": "🏛️",
+          "title": "Trust at First Glance",
+          "desc": "Buyers hire consultants who look credible. Reduce perceived risk on large engagements."
+        },
+        {
+          "icon": "📄",
+          "title": "Proposal-Grade",
+          "desc": "Sharp on PDFs and one-pagers—the format clients actually forward internally."
+        },
+        {
+          "icon": "🎤",
+          "title": "Thought Leadership",
+          "desc": "Consistent visuals across podcasts, articles, and stages reinforce your niche authority."
+        },
+        {
+          "icon": "🧭",
+          "title": "Practice-Area Fit",
+          "desc": "Strategy, ops, HR, IT—describe your niche; we avoid gimmicky stock tropes."
+        }
+      ],
+      "faqItems": [
+        {
+          "q": "Solo vs. partnership branding?",
+          "a": "Say which you are—we tune scale and formality (named partners vs. personal brand)."
+        },
+        {
+          "q": "Executive without feeling stiff?",
+          "a": "Set the tone: modern, warm, precise—we balance authority and approachability."
+        },
+        {
+          "q": "File formats?",
+          "a": "Free: PNG for quick use. Pro: vectors for print, slide masters, signatures."
+        },
+        {
+          "q": "Align with an existing site?",
+          "a": "Share palette and type hints plus brands to avoid—we keep the mark coherent."
+        },
+        {
+          "q": "Commercial license?",
+          "a": "Pro includes commercial use for client-facing work—verify scope in your plan."
+        }
+      ],
+      "relatedTypes": [
+        {
+          "slug": "digital-agency",
+          "label": "Digital Agency"
+        },
+        {
+          "slug": "startup",
+          "label": "Startup"
+        },
+        {
+          "slug": "online-course",
+          "label": "Online Course"
+        }
+      ],
+      "ctaFormSubmit": "✨ Generate My Consulting Logo — Free",
+      "ctaBottom": "Elevate my firm’s first impression",
+      "ctaSectionBlurb": "Drop a polished mark into proposals and profiles today—three free tries before you upgrade."
+    },
+    "startup": {
+      "slug": "startup",
+      "label": "Startup",
+      "keyword": "startup logo generator",
+      "seoTitle": "Startup Logo Generator — Launch Branding Investors & Users Respect | SNAPBRAND",
+      "seoDescription": "Move fast without looking amateur: AI startup logos for pitch decks, landing pages, and hiring. Look bigger than your runway—try free.",
+      "description": "From MVP to Series A—one identity that works on the deck, careers page, and product teaser.",
+      "benefits": [
+        {
+          "icon": "🚀",
+          "title": "Deck & Demo Ready",
+          "desc": "Investors skim fast—a deliberate mark signals execution, not just an idea."
+        },
+        {
+          "icon": "🧱",
+          "title": "Hiring & Culture",
+          "desc": "Same badge on recruiting posts and swag so early team members feel they joined a real company."
+        },
+        {
+          "icon": "🎯",
+          "title": "Category-Aligned",
+          "desc": "Describe your space—we steer clear of lazy rocket clichés unless that is honestly your vibe."
+        },
+        {
+          "icon": "⚡",
+          "title": "Iterate Weekly",
+          "desc": "Pivot messaging? Regenerate in minutes instead of waiting on agency cycles."
+        }
+      ],
+      "faqItems": [
+        {
+          "q": "B2B vs. DTC startups?",
+          "a": "Both—tell us buyer, category, and tone so visuals match your GTM motion."
+        },
+        {
+          "q": "Pitch deck and data room use?",
+          "a": "Free for experiments; Pro unlocks commercial use for decks, sites, and recruiting—check the plan."
+        },
+        {
+          "q": "Wordmark vs. symbol?",
+          "a": "Specify preference—we can lean typographic, icon-forward, or balanced lockups."
+        },
+        {
+          "q": "After a pivot?",
+          "a": "Generate fresh directions anytime; Pro is unlimited for exploration."
+        },
+        {
+          "q": "Turnaround time?",
+          "a": "Usually under a minute to first downloadable previews."
+        }
+      ],
+      "relatedTypes": [
+        {
+          "slug": "consulting",
+          "label": "Consulting"
+        },
+        {
+          "slug": "online-course",
+          "label": "Online Course"
+        },
+        {
+          "slug": "life-coach",
+          "label": "Life Coach"
+        }
+      ],
+      "ctaFormSubmit": "✨ Generate My Startup Logo — Free",
+      "ctaBottom": "Launch my investor-ready brand",
+      "ctaSectionBlurb": "Ship a mark you are proud to put on the deck and homepage—three free generations to find direction."
+    },
+    "photography": {
+      "slug": "photography",
+      "label": "Photography",
+      "keyword": "photography logo generator",
+      "seoTitle": "Photography Logo Generator — Studio & Freelance Brands That Get Booked | SNAPBRAND",
+      "seoDescription": "Book more clients: photography logos for weddings, portraits, and commercial work. Watermark-ready, site-ready—start free, Pro for vectors.",
+      "description": "Lead with a mark that matches your niche—editorial, romantic, or bold—so referrals remember you.",
+      "benefits": [
+        {
+          "icon": "📷",
+          "title": "Watermark-Friendly",
+          "desc": "Reads cleanly at low opacity so your images stay the hero."
+        },
+        {
+          "icon": "💍",
+          "title": "Niche Fit",
+          "desc": "Wedding, family, brand, product—describe your ideal client and style."
+        },
+        {
+          "icon": "🖼️",
+          "title": "Print & Packaging",
+          "desc": "Thank-you cards, stickers, studio signage—Pro vectors scale without blur."
+        },
+        {
+          "icon": "🌐",
+          "title": "Discovery Consistency",
+          "desc": "Same logo on Google Business, portfolio, and directories builds recognition."
+        }
+      ],
+      "faqItems": [
+        {
+          "q": "Black, white, and full-color?",
+          "a": "Note primary backgrounds (gallery dark vs. invoice light). Pro helps with master variants."
+        },
+        {
+          "q": "Brand or product photography?",
+          "a": "Yes—studio vs. location and B2B vs. couples changes the vibe; say so in the brief."
+        },
+        {
+          "q": "Commercial licensing?",
+          "a": "Pro covers client deliverables and marketing—confirm details in your plan."
+        },
+        {
+          "q": "Long business names?",
+          "a": "We can emphasize monogram or wordmark—tell us your hierarchy preference."
+        },
+        {
+          "q": "How fast?",
+          "a": "Minutes from submit to download for digital use."
+        }
+      ],
+      "relatedTypes": [
+        {
+          "slug": "consulting",
+          "label": "Consulting"
+        },
+        {
+          "slug": "startup",
+          "label": "Startup"
+        },
+        {
+          "slug": "online-course",
+          "label": "Online Course"
+        }
+      ],
+      "ctaFormSubmit": "✨ Generate My Photography Logo — Free",
+      "ctaBottom": "Book more shoots with a pro mark",
+      "ctaSectionBlurb": "Watermark, email, Instagram—one cohesive identity. Three free generations; Pro for print-ready files."
+    },
+    "beauty-salon": {
+      "slug": "beauty-salon",
+      "label": "Beauty Salon",
+      "keyword": "beauty salon logo generator",
+      "seoTitle": "Beauty Salon Logo Generator — Spa & Salon Branding Clients Trust | SNAPBRAND",
+      "seoDescription": "Fill your calendar: salon and spa logos for signage, booking apps, and Instagram. Look premium before the first visit—try free.",
+      "description": "Stand out on the block and in the feed—your mark should match your services and price point.",
+      "benefits": [
+        {
+          "icon": "✨",
+          "title": "Premium Perception",
+          "desc": "Polish supports retail upsells and higher service tiers."
+        },
+        {
+          "icon": "💇",
+          "title": "Service Menu Fit",
+          "desc": "Hair, nails, skin, med-spa—describe your aesthetic and clientele."
+        },
+        {
+          "icon": "📍",
+          "title": "Local & Loyalty",
+          "desc": "Consistent branding on maps, reviews, and storefront drives repeats."
+        },
+        {
+          "icon": "📸",
+          "title": "Promo-Ready",
+          "desc": "Readable in Stories, gift cards, and seasonal campaigns."
+        }
+      ],
+      "faqItems": [
+        {
+          "q": "Luxury without generic script?",
+          "a": "Tell us references and what to avoid—we explore distinctive directions."
+        },
+        {
+          "q": "Multi-location or franchise?",
+          "a": "Describe structure—we can suggest parent mark plus sub-brand usage in your notes."
+        },
+        {
+          "q": "Print and vinyl?",
+          "a": "Free: digital PNG. Pro: vectors for menus, signage, and merch."
+        },
+        {
+          "q": "Commercial use?",
+          "a": "Pro includes in-salon and promotional use—see plan for scope."
+        },
+        {
+          "q": "How fast can we update signage?",
+          "a": "Download in minutes; coordinate print with Pro vector exports."
+        }
+      ],
+      "relatedTypes": [
+        {
+          "slug": "saas",
+          "label": "SaaS"
+        },
+        {
+          "slug": "digital-agency",
+          "label": "Digital Agency"
+        },
+        {
+          "slug": "consulting",
+          "label": "Consulting"
+        }
+      ],
+      "ctaFormSubmit": "✨ Generate My Salon Logo — Free",
+      "ctaBottom": "Grow bookings with a standout brand",
+      "ctaSectionBlurb": "From storefront to Stories—three free generations; upgrade for vectors and commercial rights."
+    }
+  }
+}

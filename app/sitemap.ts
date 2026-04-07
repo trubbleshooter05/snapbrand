@@ -1,11 +1,8 @@
 import type { MetadataRoute } from "next";
 import { BUSINESS_TYPE_CONFIG } from "./logo-generator/[business-type]/config";
+import { getAllVerticalSlugs } from "@/lib/verticals";
+import { getAllComparisonSlugs } from "@/lib/comparisons";
 
-/**
- * Logo generator URLs are built from `BUSINESS_TYPE_CONFIG` keys (e.g. `startup`,
- * `online-course`, `life-coach`, `photography`, `beauty-salon`, and all other slugs).
- */
-/** Canonical site origin; override via NEXT_PUBLIC_SITE_URL when using a custom domain. */
 const BASE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://snapbrand-snowy.vercel.app"
 ).replace(/\/$/, "");
@@ -18,17 +15,39 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ).map((slug) => ({
     url: `${BASE_URL}/logo-generator/${slug}`,
     lastModified: now,
-    changeFrequency: "weekly",
+    changeFrequency: "weekly" as const,
     priority: 0.8,
+  }));
+
+  const verticalPages = getAllVerticalSlugs().map((slug) => ({
+    url: `${BASE_URL}/brand-kit/for/${slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
+  const comparisonPages = getAllComparisonSlugs().map((slug) => ({
+    url: `${BASE_URL}/compare/${slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
   }));
 
   return [
     {
       url: `${BASE_URL}/`,
       lastModified: now,
-      changeFrequency: "daily",
+      changeFrequency: "daily" as const,
       priority: 1,
     },
+    {
+      url: `${BASE_URL}/pricing`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    },
     ...logoGeneratorEntries,
+    ...verticalPages,
+    ...comparisonPages,
   ];
 }

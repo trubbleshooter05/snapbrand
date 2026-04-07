@@ -376,6 +376,97 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* ── Brand kits by industry ────────────────────────────────────────── */}
+      <section className="max-w-7xl mx-auto px-4 py-16 border-t border-white/10">
+        <motion.div
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.55, ease: EASE }}
+        >
+          <p className="text-sm font-semibold tracking-widest text-indigo-400 uppercase mb-3">
+            Brand kits
+          </p>
+          <h2 className="text-3xl font-bold text-white mb-2">Built for your industry</h2>
+          <p className="text-gray-400 max-w-2xl mx-auto">
+            Start from a tailored page with copy and prompts tuned to your vertical.
+          </p>
+        </motion.div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+          {[
+            { href: '/brand-kit/for/restaurant', label: 'Restaurants' },
+            { href: '/brand-kit/for/real-estate-agent', label: 'Real estate agents' },
+            { href: '/brand-kit/for/saas', label: 'SaaS & software' },
+            { href: '/brand-kit/for/ecommerce', label: 'E-commerce stores' },
+            { href: '/brand-kit/for/personal-trainer', label: 'Personal trainers' },
+          ].map(({ href, label }, i) => (
+            <motion.div
+              key={href}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 + i * 0.06, duration: 0.5, ease: EASE }}
+            >
+              <Link
+                href={href}
+                className={[
+                  'block rounded-2xl px-5 py-4',
+                  'bg-slate-900/80 backdrop-blur-2xl border border-white/10',
+                  'text-white font-medium hover:border-indigo-500/50 transition-all duration-300',
+                ].join(' ')}
+              >
+                {label} <span className="text-indigo-400">→</span>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+        <p className="text-center text-sm text-gray-500 mt-8">
+          …and 25+ more coming soon
+        </p>
+      </section>
+
+      {/* ── Compare ───────────────────────────────────────────────────────── */}
+      <section className="max-w-7xl mx-auto px-4 py-16 border-t border-white/10">
+        <motion.div
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.55, ease: EASE }}
+        >
+          <p className="text-sm font-semibold tracking-widest text-indigo-400 uppercase mb-3">
+            Compare
+          </p>
+          <h2 className="text-3xl font-bold text-white mb-2">How SnapBrand stacks up</h2>
+          <p className="text-gray-400 max-w-2xl mx-auto">
+            Honest comparisons so you can pick the right tool for your stage.
+          </p>
+        </motion.div>
+        <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
+          {[
+            { href: '/compare/snapbrand-vs-looka', label: 'vs Looka' },
+            { href: '/compare/snapbrand-vs-canva', label: 'vs Canva' },
+            { href: '/compare/snapbrand-vs-fiverr', label: 'vs Fiverr' },
+          ].map(({ href, label }, i) => (
+            <motion.div
+              key={href}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: EASE }}
+            >
+              <Link
+                href={href}
+                className={[
+                  'block rounded-2xl px-5 py-4 text-center',
+                  'bg-slate-900/80 backdrop-blur-2xl border border-white/10',
+                  'text-white font-medium hover:border-indigo-500/50 transition-all duration-300',
+                ].join(' ')}
+              >
+                SnapBrand {label}
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
       <section className="max-w-5xl mx-auto px-4 pb-28 pt-8">
         <motion.div
