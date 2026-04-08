@@ -773,5 +773,5 @@ const ALL_CONFIG: Record<string, BusinessTypeConfig> = {
 };
 
 export const getConfig = (businessType: string): BusinessTypeConfig => {
-  console.log("LOOKUP:", businessType, ALL_CONFIG[businessType]); return ALL_CONFIG[businessType] ?? ALL_CONFIG["real-estate"]
+  console.log("LOOKUP:", businessType, ALL_CONFIG[businessType]); return ALL_CONFIG[businessType.trim().toLowerCase()] ?? ALL_CONFIG["real-estate"]
 }
