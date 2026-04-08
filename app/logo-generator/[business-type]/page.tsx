@@ -6,17 +6,7 @@ interface Props {
   params: Promise<{ 'business-type': string }>
 }
 
-
-export async function generateMetadata({ params }: { params: { "business-type": string } }) {
-  const businessType = params["business-type"];
-  const config = getConfig(businessType);
-
-  return {
-    title: config.seoTitle,
-    description: config.seoDescription,
-  };
-}
-: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const businessType = (await params)['business-type']
   const config = getConfig(businessType)
 

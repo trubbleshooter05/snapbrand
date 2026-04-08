@@ -766,6 +766,12 @@ export const BUSINESS_TYPE_CONFIG: Record<string, BusinessTypeConfig> = {
 }
 
 // Default config if business type not found
+
+const ALL_CONFIG = {
+  ...BUSINESS_TYPE_CONFIG,
+  ...GENERATED_BUSINESS_TYPES
+};
+
 export const getConfig = (businessType: string): BusinessTypeConfig => {
-  return BUSINESS_TYPE_CONFIG[businessType] || BUSINESS_TYPE_CONFIG['real-estate']
+  return ALL_CONFIG[businessType] || ALL_CONFIG['real-estate']
 }
