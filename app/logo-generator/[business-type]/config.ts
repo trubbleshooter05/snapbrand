@@ -30,38 +30,6 @@ export interface BusinessTypeConfig {
   ctaSectionBlurb?: string
 }
 
-**
- * Logo Generator Page Configuration
- *
- * Add new business types here. Each type automatically gets:
- * - Dynamic URL: /logo-generator/[business-type]
- * - SEO metadata (title, description)
- * - Branded content (benefits, FAQs)
- * - Internal links
- *
- * To add a new type:
- * 1. Copy a complete entry below
- * 2. Update slug, label, keywords, benefits, faqItems
- * 3. Save — page automatically works at new URL
- */
-
-export interface BusinessTypeConfig {
-  label: string
-  keyword: string
-  seoTitle: string
-  seoDescription: string
-  description: string
-  benefits: { icon: string; title: string; desc: string }[]
-  faqItems: { q: string; a: string }[]
-  relatedTypes: { slug: string; label: string }[]
-  /** Primary form submit; audience-specific when set */
-  ctaFormSubmit?: string
-  /** Bottom section CTA link text */
-  ctaBottom?: string
-  /** Bottom section supporting copy under the headline */
-  ctaSectionBlurb?: string
-}
-
 export const BUSINESS_TYPE_CONFIG: Record<string, BusinessTypeConfig> = {
   'real-estate': {
     label: 'Real Estate',
