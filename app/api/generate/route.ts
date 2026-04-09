@@ -34,6 +34,44 @@ export interface BrandKitData {
     heading_weight: string
     body_weight:    string
   }
+  typography_scale: {
+    h1: { size: string; weight: string; line_height: string; usage: string }
+    h2: { size: string; weight: string; line_height: string; usage: string }
+    h3: { size: string; weight: string; line_height: string; usage: string }
+    h4: { size: string; weight: string; line_height: string; usage: string }
+    body: { size: string; weight: string; line_height: string; usage: string }
+    caption: { size: string; weight: string; line_height: string; usage: string }
+  }
+  spacing_system: {
+    base_unit: string
+    grid_columns: number
+    spacing_scale: string[]
+    margin_padding_standard: string
+  }
+  component_specs: {
+    button: {
+      primary: string
+      secondary: string
+      states: string[]
+    }
+    input: {
+      default: string
+      focus: string
+      error: string
+    }
+    card: string
+  }
+  imagery_guide: {
+    photo_style: string
+    illustration_style: string
+    icon_specs: string
+  }
+  accessibility: {
+    contrast_aa: string
+    contrast_aaa: string
+    wcag_compliance: string
+    font_size_minimum: string
+  }
   tagline_options: string[]
   brand_voice: {
     tone:        string
@@ -50,7 +88,7 @@ export interface BrandKitData {
 }
 
 const SYSTEM_PROMPT = `You are an expert brand strategist and creative director.
-Generate a complete, creative brand kit based on the business info provided.
+Generate a complete, comprehensive brand kit based on the business info provided.
 Return ONLY valid JSON — no markdown, no explanation, no backticks.
 
 JSON shape:
@@ -64,16 +102,54 @@ JSON shape:
   },
   "color_palette": {
     "primary":    { "hex": "#XXXXXX", "name": "Color Name", "usage": "main brand color" },
-    "secondary":  { "hex": "#XXXXXX", "name": "Color Name", "usage": "..." },
-    "accent":     { "hex": "#XXXXXX", "name": "Color Name", "usage": "..." },
-    "background": { "hex": "#XXXXXX", "name": "Color Name", "usage": "..." },
-    "text":       { "hex": "#XXXXXX", "name": "Color Name", "usage": "..." }
+    "secondary":  { "hex": "#XXXXXX", "name": "Color Name", "usage": "secondary actions" },
+    "accent":     { "hex": "#XXXXXX", "name": "Color Name", "usage": "highlights/CTAs" },
+    "background": { "hex": "#XXXXXX", "name": "Color Name", "usage": "backgrounds" },
+    "text":       { "hex": "#XXXXXX", "name": "Color Name", "usage": "text content" }
   },
   "typography": {
     "heading_font":   "Google Font Name",
     "body_font":      "Google Font Name",
     "heading_weight": "700",
     "body_weight":    "400"
+  },
+  "typography_scale": {
+    "h1": { "size": "48px", "weight": "700", "line_height": "1.2", "usage": "Page titles" },
+    "h2": { "size": "36px", "weight": "700", "line_height": "1.3", "usage": "Section headings" },
+    "h3": { "size": "28px", "weight": "600", "line_height": "1.4", "usage": "Subsection headings" },
+    "h4": { "size": "20px", "weight": "600", "line_height": "1.5", "usage": "Card titles" },
+    "body": { "size": "16px", "weight": "400", "line_height": "1.6", "usage": "Body text" },
+    "caption": { "size": "12px", "weight": "400", "line_height": "1.5", "usage": "Labels, captions" }
+  },
+  "spacing_system": {
+    "base_unit": "8px",
+    "grid_columns": 12,
+    "spacing_scale": ["8px", "16px", "24px", "32px", "40px", "48px", "56px", "64px"],
+    "margin_padding_standard": "Use multiples of 8px for all spacing"
+  },
+  "component_specs": {
+    "button": {
+      "primary": "Primary color background, white text, 12px padding, rounded corners, 2px border",
+      "secondary": "Secondary color background, white text, 12px padding, rounded corners, 2px border",
+      "states": ["default", "hover (10% opacity shift)", "active (20% opacity shift)", "disabled (50% opacity)"]
+    },
+    "input": {
+      "default": "Border color = text color at 20% opacity, padding 12px, border radius 4px",
+      "focus": "Border color = primary color, box-shadow with primary color at 10% opacity",
+      "error": "Border color = red (#EF4444), helpful error text below"
+    },
+    "card": "White background, subtle shadow (0 1px 3px rgba 0 0 0 0.1), rounded corners 8px, padding 16px"
+  },
+  "imagery_guide": {
+    "photo_style": "Use authentic, professional photography. Avoid staged/stock-photo feel. Show real people in real scenarios.",
+    "illustration_style": "Minimalist line illustrations. Consistent stroke width. Use brand colors. Keep style modern and clean.",
+    "icon_specs": "Simple geometric shapes. Consistent 2px stroke weight. 24x24px base size. Outline style, not filled."
+  },
+  "accessibility": {
+    "contrast_aa": "Primary text on primary background minimum 4.5:1 contrast ratio (WCAG AA)",
+    "contrast_aaa": "Key information should meet 7:1 contrast (WCAG AAA where possible)",
+    "wcag_compliance": "Target WCAG 2.1 AA minimum. Use semantic HTML, proper heading hierarchy, alt text on all images.",
+    "font_size_minimum": "Never use font size below 12px for body text. 14px minimum for accessibility."
   },
   "tagline_options": ["Tagline 1", "Tagline 2", "Tagline 3"],
   "brand_voice": {
@@ -156,7 +232,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       temperature: 0.8,
-      max_tokens: 2000,
+      max_tokens: 4000,
       response_format: { type: 'json_object' },
     })
 

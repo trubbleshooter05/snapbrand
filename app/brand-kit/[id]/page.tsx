@@ -290,6 +290,168 @@ export default function BrandKitPage() {
           </section>
         )}
 
+        {/* ── Typography Scale ──────────────────────────────────────────────── */}
+        {kit?.typography_scale && (
+          <section>
+            <SectionLabel>Typography Scale</SectionLabel>
+            <div className="space-y-4">
+              {Object.entries(kit.typography_scale).map(([key, val]) => (
+                <div key={key} className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-bold uppercase tracking-wider text-gray-400">{key}</p>
+                    <p className="text-xs text-gray-500">{val.size} • {val.weight} • {val.line_height}lh</p>
+                  </div>
+                  <p
+                    className="text-xl mb-2"
+                    style={{
+                      fontSize: val.size,
+                      fontWeight: val.weight,
+                      lineHeight: val.line_height,
+                      fontFamily: heading ? `'${heading}', sans-serif` : undefined,
+                    }}
+                  >
+                    The quick brown fox
+                  </p>
+                  <p className="text-xs text-gray-500">{val.usage}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Spacing & Grid System ─────────────────────────────────────────── */}
+        {kit?.spacing_system && (
+          <section>
+            <SectionLabel>Spacing & Grid System</SectionLabel>
+            <div className="space-y-4">
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-3">Base Unit</p>
+                <p className="text-lg text-white mb-4">{kit.spacing_system.base_unit}</p>
+                <p className="text-xs text-gray-400 mb-4">{kit.spacing_system.margin_padding_standard}</p>
+              </div>
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-3">Grid</p>
+                <p className="text-lg text-white">{kit.spacing_system.grid_columns}-column grid</p>
+              </div>
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-3">Spacing Scale</p>
+                <div className="space-y-2">
+                  {kit.spacing_system.spacing_scale.map((space, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div
+                        style={{
+                          width: space,
+                          height: '24px',
+                          backgroundColor: primary,
+                          borderRadius: '4px',
+                        }}
+                      />
+                      <span className="text-sm text-gray-300">{space}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── Component Specs ────────────────────────────────────────────────── */}
+        {kit?.component_specs && (
+          <section>
+            <SectionLabel>Component Library</SectionLabel>
+            <div className="space-y-4">
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-4">Buttons</p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">Primary</p>
+                    <p className="text-sm text-gray-300">{kit.component_specs.button.primary}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">Secondary</p>
+                    <p className="text-sm text-gray-300">{kit.component_specs.button.secondary}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">States</p>
+                    <ul className="text-sm text-gray-300 list-disc list-inside space-y-1">
+                      {kit.component_specs.button.states.map((state, i) => (
+                        <li key={i}>{state}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-4">Input Fields</p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">Default</p>
+                    <p className="text-sm text-gray-300">{kit.component_specs.input.default}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">Focus</p>
+                    <p className="text-sm text-gray-300">{kit.component_specs.input.focus}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">Error</p>
+                    <p className="text-sm text-gray-300">{kit.component_specs.input.error}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Cards</p>
+                <p className="text-sm text-gray-300">{kit.component_specs.card}</p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── Imagery Guide ──────────────────────────────────────────────────── */}
+        {kit?.imagery_guide && (
+          <section>
+            <SectionLabel>Imagery & Icon Style</SectionLabel>
+            <div className="space-y-4">
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Photography</p>
+                <p className="text-sm text-gray-300">{kit.imagery_guide.photo_style}</p>
+              </div>
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Illustration</p>
+                <p className="text-sm text-gray-300">{kit.imagery_guide.illustration_style}</p>
+              </div>
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Icons</p>
+                <p className="text-sm text-gray-300">{kit.imagery_guide.icon_specs}</p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── Accessibility ──────────────────────────────────────────────────── */}
+        {kit?.accessibility && (
+          <section>
+            <SectionLabel>Accessibility Guidelines</SectionLabel>
+            <div className="space-y-4">
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">WCAG AA Contrast</p>
+                <p className="text-sm text-gray-300">{kit.accessibility.contrast_aa}</p>
+              </div>
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">WCAG AAA Contrast</p>
+                <p className="text-sm text-gray-300">{kit.accessibility.contrast_aaa}</p>
+              </div>
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Compliance Target</p>
+                <p className="text-sm text-gray-300">{kit.accessibility.wcag_compliance}</p>
+              </div>
+              <div className="bg-slate-900/80 border border-white/10 rounded-xl p-6">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Minimum Font Size</p>
+                <p className="text-sm text-gray-300">{kit.accessibility.font_size_minimum}</p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* ── Logo concepts ─────────────────────────────────────────────────── */}
         {kit?.logo_concepts && kit.logo_concepts.length > 0 && (
           <section>
