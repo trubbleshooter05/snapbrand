@@ -1,3 +1,4 @@
+// NextAuth v4 (stable). Stay on the v4 line until a deliberate v5 migration; test OAuth + sessions after any major bump.
 import { NextAuthOptions, DefaultSession } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
