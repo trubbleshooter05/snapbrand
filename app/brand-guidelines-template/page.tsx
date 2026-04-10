@@ -53,7 +53,7 @@ export default function BrandGuidelinesTemplatePage() {
       title: 'How to Create Brand Guidelines (Step-by-Step)',
       content: [
         'Define Your Brand Identity: Start with your brand story, values, and unique positioning',
-        'Document Visual Elements: Gather all logos, colors, and fonts you'll use',
+        `Document Visual Elements: Gather all logos, colors, and fonts you'll use`,
         'Write Style Guide: Define tone, voice, and messaging approach',
         'Create Visual Examples: Show how guidelines apply to real-world materials',
         'Get Feedback: Review with team members and key stakeholders',
@@ -61,14 +61,14 @@ export default function BrandGuidelinesTemplatePage() {
       ],
     },
     {
-      title: 'Free Brand Guidelines Template: What You\'ll Get',
+      title: `Free Brand Guidelines Template: What You'll Get`,
       content:
-        'A professional, ready-to-use brand guidelines template that includes sections for logo usage, color specifications, typography rules, brand voice, and real-world application examples. Simply fill in your brand information and share with your team.',
+        `A professional, ready-to-use brand guidelines template that includes sections for logo usage, color specifications, typography rules, brand voice, and real-world application examples. Simply fill in your brand information and share with your team.`,
     },
     {
       title: 'How SnapBrand Simplifies This Process',
       content:
-        'Instead of starting from a blank template, SnapBrand generates your entire brand system in 60 seconds. Describe your business, and our AI creates a logo, color palette, typography system, and brand voice — all ready to be documented in your guidelines. This gives you a complete, cohesive starting point that you can immediately turn into professional brand guidelines.',
+        `Instead of starting from a blank template, SnapBrand generates your entire brand system in 60 seconds. Describe your business, and our AI creates a logo, color palette, typography system, and brand voice — all ready to be documented in your guidelines. This gives you a complete, cohesive starting point that you can immediately turn into professional brand guidelines.`,
     },
   ]
 

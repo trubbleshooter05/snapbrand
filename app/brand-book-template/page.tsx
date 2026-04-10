@@ -30,9 +30,9 @@ export default function BrandBookTemplatePage() {
         'A brand book (also called a brand manual) is a comprehensive document that tells your brand story and establishes design standards. It goes beyond guidelines to explain the "why" behind your brand decisions.',
     },
     {
-      title: 'Brand Book vs. Brand Guidelines: What\'s the Difference?',
+      title: `Brand Book vs. Brand Guidelines: What's the Difference?`,
       content:
-        'While "brand book," "brand guide," and "brand guidelines" are often used interchangeably, a brand book typically includes more narrative content — your brand story, values, and mission. Guidelines focus on the mechanics (colors, fonts, sizes). A brand book combines both.',
+        `While "brand book," "brand guide," and "brand guidelines" are often used interchangeably, a brand book typically includes more narrative content — your brand story, values, and mission. Guidelines focus on the mechanics (colors, fonts, sizes). A brand book combines both.`,
     },
     {
       title: 'What to Include in Your Brand Book',
@@ -55,12 +55,12 @@ export default function BrandBookTemplatePage() {
     {
       title: 'How to Create a Brand Book',
       content:
-        'Start with your brand identity — visuals, voice, and values. Then organize them into a logical narrative that tells your brand story. Include real examples of your brand in use. Make it accessible and shareable.',
+        `Start with your brand identity — visuals, voice, and values. Then organize them into a logical narrative that tells your brand story. Include real examples of your brand in use. Make it accessible and shareable.`,
     },
     {
       title: 'Get Started With SnapBrand',
       content:
-        'Your brand book foundation should start with a cohesive visual identity. SnapBrand generates logos, color systems, and typography in seconds — everything you need to begin building your brand book.',
+        `Your brand book foundation should start with a cohesive visual identity. SnapBrand generates logos, color systems, and typography in seconds — everything you need to begin building your brand book.`,
     },
   ]
 

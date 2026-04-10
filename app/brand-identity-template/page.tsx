@@ -48,17 +48,17 @@ export default function BrandIdentityTemplatePage() {
     {
       title: 'Creating Your Brand Identity',
       content:
-        'Start by defining your brand personality and values. Then translate those into visual elements: colors that evoke the right feeling, fonts that match your tone, and a logo that represents your essence.',
+        `Start by defining your brand personality and values. Then translate those into visual elements: colors that evoke the right feeling, fonts that match your tone, and a logo that represents your essence.`,
     },
     {
       title: 'Brand Identity Examples',
       content:
-        'Look at brands you admire. Notice how Apple\'s minimalism reflects innovation, how Coca-Cola\'s red is instantly recognizable, or how Mailchimp\'s playful design matches their approachable voice. Each element works together.',
+        `Look at brands you admire. Notice how Apple's minimalism reflects innovation, how Coca-Cola's red is instantly recognizable, or how Mailchimp's playful design matches their approachable voice. Each element works together.`,
     },
     {
       title: 'Build Your Identity With SnapBrand',
       content:
-        'SnapBrand generates a complete, cohesive brand identity in 60 seconds. Describe your business and get colors, typography, logo concepts, and brand voice that all work together.',
+        `SnapBrand generates a complete, cohesive brand identity in 60 seconds. Describe your business and get colors, typography, logo concepts, and brand voice that all work together.`,
     },
   ]
 

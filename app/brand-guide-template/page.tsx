@@ -31,7 +31,7 @@ export default function BrandGuideTemplatePage() {
     {
       title: 'The Difference Between Brand Guide and Brand Guidelines',
       content:
-        'Often used interchangeably, "brand guide" and "brand guidelines" refer to the same thing. Both are comprehensive documents that specify how to use your brand elements. The term you use doesn\'t matter — what matters is having the documentation.',
+        `Often used interchangeably, "brand guide" and "brand guidelines" refer to the same thing. Both are comprehensive documents that specify how to use your brand elements. The term you use doesn't matter — what matters is having the documentation.`,
     },
     {
       title: 'Key Elements Your Brand Guide Should Cover',
@@ -58,7 +58,7 @@ export default function BrandGuideTemplatePage() {
     {
       title: 'Benefits of Having a Brand Guide',
       content:
-        'A documented brand guide prevents brand dilution, accelerates team onboarding, improves customer recognition, and establishes credibility. It's the difference between a brand that looks professional and organized versus one that appears inconsistent and amateur.',
+        `A documented brand guide prevents brand dilution, accelerates team onboarding, improves customer recognition, and establishes credibility. It's the difference between a brand that looks professional and organized versus one that appears inconsistent and amateur.`,
     },
     {
       title: 'Build Your Brand Guide With SnapBrand',

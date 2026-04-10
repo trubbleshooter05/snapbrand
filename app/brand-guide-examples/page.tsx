@@ -27,7 +27,7 @@ export default function BrandGuideExamplesPage() {
     {
       title: 'What Can You Learn From Brand Guide Examples?',
       content:
-        'Brand guide examples show you how real companies structure their standards. By studying them, you\'ll learn what information matters most, how much detail to include, and what format works best for your team.',
+        `Brand guide examples show you how real companies structure their standards. By studying them, you'll learn what information matters most, how much detail to include, and what format works best for your team.`,
     },
     {
       title: 'Elements Found in Most Brand Guides',
@@ -44,7 +44,7 @@ export default function BrandGuideExamplesPage() {
     {
       title: 'How Startups Structure Brand Guides',
       content:
-        'Early-stage companies keep brand guides focused and concise. They include essentials (logo, colors, fonts, tone) without over-complicating. This approach works better for small teams and makes it easier to update as the brand evolves.',
+        `Early-stage companies keep brand guides focused and concise. They include essentials (logo, colors, fonts, tone) without over-complicating. This approach works better for small teams and makes it easier to update as the brand evolves.`,
     },
     {
       title: 'Enterprise-Level Brand Guide Structure',
@@ -57,13 +57,13 @@ export default function BrandGuideExamplesPage() {
         'Modern guides are interactive, digital-first, and live documents updated regularly',
         'Traditional guides are static PDFs created once and rarely updated',
         'Progressive companies use both: a digital guide for daily use + a PDF for distribution',
-        'Mobile-optimized guides help team members reference standards from anywhere',
+        `Mobile-optimized guides help team members reference standards from anywhere`,
       ],
     },
     {
       title: 'Get Started With SnapBrand',
       content:
-        'The best brand guide starts with a professional brand system. SnapBrand generates cohesive colors, typography, and brand voice instantly. Use this as the foundation for your brand guide — it\'s already designed to work together.',
+        `The best brand guide starts with a professional brand system. SnapBrand generates cohesive colors, typography, and brand voice instantly. Use this as the foundation for your brand guide — it's already designed to work together.`,
     },
   ]
 

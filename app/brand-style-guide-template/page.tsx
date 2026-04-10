@@ -32,7 +32,7 @@ export default function BrandStyleGuideTemplatePage() {
     {
       title: 'Brand Style Guide vs. Brand Guidelines',
       content:
-        'A style guide focuses on design mechanics and technical specifications. Brand guidelines include broader elements like brand voice and values. Many companies use both together: guidelines for strategy, style guides for execution.',
+        `A style guide focuses on design mechanics and technical specifications. Brand guidelines include broader elements like brand voice and values. Many companies use both together: guidelines for strategy, style guides for execution.`,
     },
     {
       title: 'Essential Sections of a Brand Style Guide',
@@ -49,17 +49,17 @@ export default function BrandStyleGuideTemplatePage() {
     {
       title: 'Who Uses Brand Style Guides?',
       content:
-        'Product designers, web developers, content creators, and marketing teams all reference style guides. They ensure consistency across your website, apps, and marketing materials.',
+        `Product designers, web developers, content creators, and marketing teams all reference style guides. They ensure consistency across your website, apps, and marketing materials.`,
     },
     {
       title: 'Digital vs. Print Style Guides',
       content:
-        'Digital style guides cover web and app design: colors for light and dark modes, responsive typography, and interactive states. Print guides cover offset colors (CMYK), paper stocks, and print specifications.',
+        `Digital style guides cover web and app design: colors for light and dark modes, responsive typography, and interactive states. Print guides cover offset colors (CMYK), paper stocks, and print specifications.`,
     },
     {
       title: 'Start With SnapBrand',
       content:
-        'Your style guide needs a strong foundation. SnapBrand generates color systems and typography that work together across your entire product.',
+        `Your style guide needs a strong foundation. SnapBrand generates color systems and typography that work together across your entire product.`,
     },
   ]
 

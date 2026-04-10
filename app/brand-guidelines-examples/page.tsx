@@ -36,7 +36,7 @@ export default function BrandGuidelinesExamplesPage() {
         'Complete Color Specifications: Hex, RGB, Pantone, and CMYK values',
         'Typography Hierarchy: Primary, secondary, and accent fonts with sizes',
         'Real-World Applications: How guidelines apply to websites, print, packaging',
-        'Do\'s and Don\'ts: Visual examples of correct and incorrect usage',
+        `Do's and Don'ts: Visual examples of correct and incorrect usage`,
         'Brand Voice Guidelines: Tone, messaging style, and key phrases',
         'Visual Assets: Icons, patterns, and supporting design elements',
       ],
@@ -44,12 +44,12 @@ export default function BrandGuidelinesExamplesPage() {
     {
       title: 'Learning From Tech Company Guidelines',
       content:
-        'Tech companies like Apple, Google, and Microsoft publish their design systems online. Study how they handle color usage across light and dark modes, responsive typography, and consistency across products. These examples show how to maintain brand cohesion at scale.',
+        `Tech companies like Apple, Google, and Microsoft publish their design systems online. Study how they handle color usage across light and dark modes, responsive typography, and consistency across products. These examples show how to maintain brand cohesion at scale.`,
     },
     {
       title: 'Small Business Brand Guidelines Examples',
       content:
-        'Small businesses and startups benefit from studying mid-size company guidelines. These examples show professional standards without enterprise complexity. Look at how newer brands handle logo variations, color palettes, and messaging.',
+        `Small businesses and startups benefit from studying mid-size company guidelines. These examples show professional standards without enterprise complexity. Look at how newer brands handle logo variations, color palettes, and messaging.`,
     },
     {
       title: 'Common Mistakes in Brand Guidelines',
