@@ -76,9 +76,6 @@ export default function BrandGuidelinesExamplesPage() {
 
   return (
     <SeoTemplatePage
-      keyword="brand guidelines examples"
-      title="Brand Guidelines Examples | Real-World Templates"
-      metaDescription="See real brand guidelines examples from top companies. Learn what makes great brand standards and how to create your own."
       h1="Brand Guidelines Examples"
       intro="Study real examples of professional brand guidelines from successful companies. Learn best practices and what makes effective brand standards."
       sections={sections}

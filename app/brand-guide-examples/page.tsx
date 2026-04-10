@@ -75,9 +75,6 @@ export default function BrandGuideExamplesPage() {
 
   return (
     <SeoTemplatePage
-      keyword="brand guide examples"
-      title="Brand Guide Examples | Inspire Your Brand Standards"
-      metaDescription="Browse brand guide examples to inspire your own. See how successful brands define their visual identity and messaging."
       h1="Brand Guide Examples"
       intro="Explore how successful brands structure their brand guides. Get inspiration and learn best practices for creating your own comprehensive brand standards."
       sections={sections}

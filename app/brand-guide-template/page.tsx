@@ -75,9 +75,6 @@ export default function BrandGuideTemplatePage() {
 
   return (
     <SeoTemplatePage
-      keyword="brand guide template"
-      title="Brand Guide Template | Create Your Brand Standards"
-      metaDescription="Professional brand guide template for startups and small businesses. Document colors, fonts, logo rules, and brand voice."
       h1="Brand Guide Template"
       intro="Create a professional brand guide that ensures consistency across all your marketing materials. This template helps you document your logo, colors, typography, and brand voice."
       sections={sections}

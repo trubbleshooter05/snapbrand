@@ -8,9 +8,6 @@ interface Section {
 }
 
 interface SeoTemplatePageProps {
-  keyword: string
-  title: string
-  metaDescription: string
   h1: string
   intro: string
   sections: Section[]
@@ -18,9 +15,6 @@ interface SeoTemplatePageProps {
 }
 
 export default function SeoTemplatePage({
-  keyword,
-  title,
-  metaDescription,
   h1,
   intro,
   sections,

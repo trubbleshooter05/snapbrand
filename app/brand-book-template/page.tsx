@@ -72,9 +72,6 @@ export default function BrandBookTemplatePage() {
 
   return (
     <SeoTemplatePage
-      keyword="brand book template"
-      title="Brand Book Template | Professional Brand Standards"
-      metaDescription="Free brand book template to document your complete brand identity. Create professional brand standards in minutes."
       h1="Brand Book Template"
       intro="Create a professional brand book that tells your brand story and establishes design standards. This template includes everything from your mission to logo usage rules."
       sections={sections}

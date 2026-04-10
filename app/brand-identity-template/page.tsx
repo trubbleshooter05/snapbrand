@@ -70,9 +70,6 @@ export default function BrandIdentityTemplatePage() {
 
   return (
     <SeoTemplatePage
-      keyword="brand identity template"
-      title="Brand Identity Template | Design Your Complete Brand"
-      metaDescription="Free brand identity template to define your logo, colors, fonts, and brand personality. Create a cohesive visual identity."
       h1="Brand Identity Template"
       intro="Build a strong, recognizable brand identity. This template helps you define your logo, colors, typography, and brand voice."
       sections={sections}

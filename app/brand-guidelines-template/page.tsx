@@ -80,9 +80,6 @@ export default function BrandGuidelinesTemplatePage() {
 
   return (
     <SeoTemplatePage
-      keyword="brand guidelines template"
-      title="Brand Guidelines Template | Free Download"
-      metaDescription="Free brand guidelines template to document your logo, colors, fonts, and messaging. Download now."
       h1="Brand Guidelines Template"
       intro="A complete template to document your brand's visual identity, voice, and messaging. Use this guide to ensure consistency across all your marketing materials."
       sections={sections}

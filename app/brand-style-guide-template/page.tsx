@@ -71,9 +71,6 @@ export default function BrandStyleGuideTemplatePage() {
 
   return (
     <SeoTemplatePage
-      keyword="brand style guide template"
-      title="Brand Style Guide Template | Design System Documentation"
-      metaDescription="Free brand style guide template to document colors, fonts, icons, and UI patterns. Create design system standards."
       h1="Brand Style Guide Template"
       intro="Create comprehensive design system documentation with this brand style guide template. Define colors, typography, components, and patterns."
       sections={sections}
