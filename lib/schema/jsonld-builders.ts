@@ -1,5 +1,4 @@
 import {
-  CONTACT_EMAIL,
   EDITORIAL_ATTRIBUTION,
   SITE_CONTENT_REVIEWED_ISO,
   SITE_NAME,
@@ -23,7 +22,6 @@ export function organizationSchemaGraph() {
           "@type": "ContactPoint",
           contactType: "customer support",
           url: `${SITE_URL}/contact`,
-          ...(CONTACT_EMAIL ? { email: CONTACT_EMAIL } : {}),
         },
       },
       {

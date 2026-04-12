@@ -20,8 +20,8 @@ export function formatReviewDate(iso: string): string {
 }
 
 /**
- * Optional public support inbox. Set `NEXT_PUBLIC_CONTACT_EMAIL` in your environment
- * when you have an address you want listed; otherwise the site uses non-email contact paths.
+ * Optional support inbox for a label-only “Email” button (mailto). The address is not
+ * printed on the page or included in Organization JSON-LD; it exists only in the mailto URL.
  */
 export const CONTACT_EMAIL: string | undefined = (() => {
   const raw = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
