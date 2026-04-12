@@ -19,8 +19,14 @@ export function formatReviewDate(iso: string): string {
   });
 }
 
-export const CONTACT_EMAIL =
-  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "contact@snapbrand.app";
+/**
+ * Optional public support inbox. Set `NEXT_PUBLIC_CONTACT_EMAIL` in your environment
+ * when you have an address you want listed; otherwise the site uses non-email contact paths.
+ */
+export const CONTACT_EMAIL: string | undefined = (() => {
+  const raw = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
+  return raw && raw.length > 0 ? raw : undefined;
+})();
 
 export function getDefaultArticleByline() {
   return {

@@ -22,8 +22,8 @@ export function organizationSchemaGraph() {
         contactPoint: {
           "@type": "ContactPoint",
           contactType: "customer support",
-          email: CONTACT_EMAIL,
           url: `${SITE_URL}/contact`,
+          ...(CONTACT_EMAIL ? { email: CONTACT_EMAIL } : {}),
         },
       },
       {

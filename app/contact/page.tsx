@@ -40,26 +40,60 @@ export default function ContactPage() {
           </p>
           <h1 className="text-4xl font-bold text-white mb-6">Contact</h1>
           <p className="text-gray-400 mb-10 leading-relaxed">
-            We read every message. For fastest help, include your account email (if
-            applicable) and a short description of the issue.
+            Here’s how to get help or send a formal request without needing a public mailbox
+            on this page.
           </p>
 
           <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-8 space-y-6">
-            <div>
-              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
-                Email
-              </h2>
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                className="text-lg text-indigo-400 hover:text-indigo-300 break-all"
-              >
-                {CONTACT_EMAIL}
-              </a>
-              <p className="text-sm text-gray-500 mt-2">
-                Set <code className="text-gray-400">NEXT_PUBLIC_CONTACT_EMAIL</code> in
-                your deployment to override this address.
-              </p>
-            </div>
+            {CONTACT_EMAIL ? (
+              <div>
+                <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Email
+                </h2>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="text-lg text-indigo-400 hover:text-indigo-300 break-all"
+                >
+                  {CONTACT_EMAIL}
+                </a>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  How to reach us
+                </h2>
+                <ul className="space-y-3 text-gray-300 text-sm leading-relaxed">
+                  <li>
+                    <strong className="text-white">Product &amp; generation:</strong> use the{" "}
+                    <Link className="text-indigo-400 hover:text-indigo-300" href="/#generate">
+                      brand kit generator
+                    </Link>{" "}
+                    on the home page (no signup required for your first tries).
+                  </li>
+                  <li>
+                    <strong className="text-white">Account &amp; billing:</strong> sign in and
+                    use your dashboard and{" "}
+                    <Link className="text-indigo-400 hover:text-indigo-300" href="/pricing">
+                      pricing
+                    </Link>{" "}
+                    for plan details. Checkout is handled by our payment provider.
+                  </li>
+                  <li>
+                    <strong className="text-white">Privacy &amp; data rights:</strong> see our{" "}
+                    <Link className="text-indigo-400 hover:text-indigo-300" href="/privacy">
+                      Privacy Policy
+                    </Link>{" "}
+                    for what we collect and how to request access, correction, or deletion where
+                    applicable.
+                  </li>
+                </ul>
+                <p className="text-xs text-gray-500 mt-4">
+                  To show a support email on this page later, set{" "}
+                  <code className="text-gray-400">NEXT_PUBLIC_CONTACT_EMAIL</code> in your
+                  hosting environment.
+                </p>
+              </div>
+            )}
 
             <div>
               <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
