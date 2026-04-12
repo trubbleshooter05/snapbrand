@@ -332,17 +332,18 @@ export default function BrandKitPage() {
   // ── Page ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white">
+    <div className="brand-kit-page min-h-screen bg-[#0A0A0F] text-white print:min-h-0">
       {googleFontsUrl && <link href={googleFontsUrl} rel="stylesheet" />}
 
       {/* Nav */}
-      <nav className="px-6 py-5 flex items-center justify-between border-b border-white/10">
-        <Link href="/" className="text-[11px] text-gray-600 hover:text-white transition-colors tracking-wide">
+      <nav className="px-6 py-5 flex items-center justify-between border-b border-white/10 print:border-neutral-200 print:py-3">
+        <Link href="/" className="text-[11px] text-gray-600 hover:text-white transition-colors tracking-wide print:text-neutral-600 print:hover:text-neutral-800">
           ← SnapBrand
         </Link>
         <button
+          type="button"
           onClick={() => navigator.clipboard.writeText(window.location.href)}
-          className="text-[10px] text-gray-600 hover:text-white transition-colors border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-lg"
+          className="text-[10px] text-gray-600 hover:text-white transition-colors border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-lg print:hidden"
         >
           Share
         </button>

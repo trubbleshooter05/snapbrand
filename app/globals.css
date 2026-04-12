@@ -53,3 +53,36 @@ body {
     text-wrap: balance;
   }
 }
+
+/* ─── Brand kit: print / Save as PDF ─────────────────────────────────────────
+   Browsers often hide background graphics by default → light text vanishes on
+   white. We force color preservation AND solid panels so exports stay readable. */
+@media print {
+  @page {
+    margin: 12mm;
+    size: auto;
+  }
+
+  .brand-kit-page,
+  .brand-kit-page * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .brand-kit-page {
+    background-color: #0a0a0f !important;
+  }
+
+  /* Reduce empty pages from min-height hacks */
+  .brand-kit-page {
+    min-height: auto !important;
+  }
+
+  /* Keep mockup cards from splitting awkwardly across pages */
+  .brand-kit-page section,
+  .brand-kit-page .rounded-2xl,
+  .brand-kit-page .rounded-3xl {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
