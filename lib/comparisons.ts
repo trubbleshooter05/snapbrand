@@ -1,3 +1,5 @@
+import { SITE_CONTENT_REVIEWED_ISO } from "@/lib/site";
+
 export interface Comparison {
   slug: string;
   competitor: string;
@@ -9,6 +11,8 @@ export interface Comparison {
   competitorAdvantages: string[];
   competitorPricing: string;
   verdict: string;
+  /** ISO date for Article schema and bylines (editorial review). */
+  dateModified: string;
 }
 
 export const comparisons: Comparison[] = [
@@ -16,77 +20,92 @@ export const comparisons: Comparison[] = [
     slug: "snapbrand-vs-looka",
     competitor: "Looka",
     metaTitle: "SnapBrand vs Looka — AI Brand Kit Comparison (2026)",
-    metaDescription: "Compare SnapBrand and Looka. See features, pricing, and which AI brand tool is better for your business.",
-    h1: "SnapBrand vs Looka: Which Is Better for Your Brand?",
-    competitorDescription: "Looka is an AI logo maker that generates logos based on style preferences and provides a Brand Kit as an add-on product.",
+    metaDescription:
+      "Side-by-side overview: how SnapBrand and Looka differ on workflow, outputs, and pricing models for AI-assisted branding.",
+    h1: "SnapBrand vs Looka: Which Fits Your Workflow?",
+    competitorDescription:
+      "Looka is an AI-assisted logo tool: you pick styles and refine a mark, and you can add a Brand Kit as a paid add-on for related assets.",
     advantages: [
-      "Complete brand system in one generation, not just a logo",
-      "Industry-specific brand kits tailored to your vertical",
-      "Brand voice and copywriting guidelines included",
-      "3 free generations with no credit card",
-      "Complete kit in 60 seconds vs multi-step process"
+      "Outputs a structured kit in one pass (logo direction, palette, type, and messaging cues) from a short brief",
+      "Industry-oriented prompts when you start from vertical landing pages",
+      "Includes voice and tagline-style copy suggestions alongside visuals",
+      "Free tier includes several generations without a card on file (limits apply)",
+      "Typical flow completes in roughly a minute for a first draft",
     ],
     competitorAdvantages: [
-      "More established brand with wider recognition",
-      "More logo customization in their editor",
-      "Business card and stationery mockups",
-      "Larger print template library"
+      "Widely known product with a long track record in DIY logo design",
+      "Deeper in-editor logo adjustments than a single-pass generator",
+      "Mockups for business cards and some print-oriented layouts",
+      "Large library of template-driven applications",
     ],
-    competitorPricing: "Free to design, $20-65 for logo, $96 for Brand Kit (one-time)",
-    verdict: "Looka is better for logo-focused needs with extensive editing. SnapBrand is better if you need a complete brand identity system — colors, fonts, voice, strategy — quickly and affordably."
+    competitorPricing:
+      "Historically: free to explore; paid logo and Brand Kit options are sold separately (check Looka for current numbers).",
+    verdict:
+      "If your bottleneck is iterating on a single mark with heavy manual tweaks, Looka’s editor-centric flow can make sense. If you want a fast, unified first draft of logo + palette + type + messaging to react to, SnapBrand is built around that single-pass kit model. Confirm current pricing and export terms on each vendor’s site before you buy.",
+    dateModified: SITE_CONTENT_REVIEWED_ISO,
   },
   {
     slug: "snapbrand-vs-canva",
     competitor: "Canva",
     metaTitle: "SnapBrand vs Canva Brand Kit — Key Difference Explained (2026)",
-    metaDescription: "SnapBrand generates your brand with AI. Canva stores a brand you already have. See the key difference.",
-    h1: "SnapBrand vs Canva: Generator vs Storage",
-    competitorDescription: "Canva's Brand Kit stores your existing brand assets and helps apply them across designs. It does NOT generate a brand identity for you.",
+    metaDescription:
+      "Clarifies the difference between generating a new brand with AI and storing an existing brand in Canva’s Brand Kit.",
+    h1: "SnapBrand vs Canva: Generation vs Brand Kit Storage",
+    competitorDescription:
+      "Canva’s Brand Kit (on paid plans) stores logos, colors, and fonts so they can be applied across designs. It assumes you already have those assets.",
     advantages: [
-      "Generates your brand from scratch — no existing assets needed",
-      "AI-powered: describe your business, get a complete brand",
-      "Includes brand voice, taglines, and strategy",
-      "Perfect for businesses that don't have a brand yet",
-      "3 free generations let you explore options"
+      "Produces an initial brand direction from text when you do not yet have finalized assets",
+      "AI-generated palette and type pairing in the same step as logo directions",
+      "Copy and tone suggestions aimed at early positioning drafts",
+      "Useful when you are starting from only a name and a short description",
+      "Free tier lets you try multiple directions before paying",
     ],
     competitorAdvantages: [
-      "Millions of design templates",
-      "Full design editor for any marketing material",
-      "Team collaboration features",
-      "Better for applying an existing brand"
+      "Very large template library for social, print, and presentations",
+      "Full canvas editor for day-to-day design work",
+      "Collaboration and brand control features for teams (plan-dependent)",
+      "Strong fit once your hex codes and logos are locked",
     ],
-    competitorPricing: "Free basic, $13/mo Pro, $10/person/mo Teams",
-    verdict: "Different tools for different jobs. SnapBrand CREATES your brand. Canva APPLIES it. Start with SnapBrand, then use Canva to create designs with your new brand assets. They're complementary."
+    competitorPricing:
+      "Varies by region and plan; see Canva’s pricing page for Pro and Teams.",
+    verdict:
+      "These tools solve different problems: SnapBrand is aimed at producing an initial brand system from a brief; Canva is aimed at applying an existing brand across creative work. Teams often draft or refresh direction in a generator, then move approved assets into Canva (or any design tool) for production. Verify feature availability on your Canva plan.",
+    dateModified: SITE_CONTENT_REVIEWED_ISO,
   },
   {
     slug: "snapbrand-vs-fiverr",
     competitor: "Fiverr",
     metaTitle: "SnapBrand vs Fiverr Logo Design — AI vs Freelancer (2026)",
-    metaDescription: "AI brand kit or Fiverr designer? Compare speed, cost, quality, and what you actually get.",
-    h1: "SnapBrand vs Fiverr: AI Brand Kit vs Freelancer",
-    competitorDescription: "Fiverr connects you with freelance designers for logos and brand identities. Prices range from $5 to $500+.",
+    metaDescription:
+      "Compare turnaround, cost structure, and what you typically receive from AI brand kits versus hiring a freelancer on Fiverr.",
+    h1: "SnapBrand vs Fiverr: AI Brand Kit vs Freelance Designer",
+    competitorDescription:
+      "Fiverr is a marketplace: you hire individual designers with their own styles, timelines, and deliverable packages. Pricing spans a wide range.",
     advantages: [
-      "60 seconds vs 3-7 days on Fiverr",
-      "Unlimited iterations on Pro plan",
-      "Complete brand system, not just a logo",
-      "No designer lottery — consistent quality",
-      "Try before you buy with free generations"
+      "Near-instant first drafts instead of multi-day scheduling cycles",
+      "Predictable tool behavior for iteration on a subscription or free tier",
+      "Structured kit output (colors, fonts, messaging) in one session",
+      "Useful for exploring directions before briefing a human designer",
+      "Lower friction when you need something credible today and may refine later",
     ],
     competitorAdvantages: [
-      "Human creative input and original vision",
-      "Complex custom illustration work",
-      "Vector source files (AI, EPS) included",
-      "Better for unusual or highly specific needs"
+      "Original art direction from a person who can interpret nuance",
+      "Suitable for bespoke illustration or unusual brand requirements",
+      "Some gigs include editable vector source files by agreement",
+      "You can select specialists by portfolio fit",
     ],
-    competitorPricing: "$5-50 basic logo, $100-300 brand package, $500+ premium",
-    verdict: "Use SnapBrand to explore directions and get a working brand today. If you later want custom illustration, hire a Fiverr designer and hand them your SnapBrand kit as a brief — they'll charge less when you already know what you want."
-  }
+    competitorPricing:
+      "Highly variable by seller and scope; always read the gig description for file types and revisions.",
+    verdict:
+      "Many teams use AI kits to narrow direction quickly, then commission a designer for polish, illustration, or production-ready vector work. If you need hand-drawn craft or complex brand systems, a vetted freelancer may still be the right investment. Review deliverables and revision counts before ordering.",
+    dateModified: SITE_CONTENT_REVIEWED_ISO,
+  },
 ];
 
 export function getComparisonBySlug(slug: string): Comparison | undefined {
-  return comparisons.find(c => c.slug === slug);
+  return comparisons.find((c) => c.slug === slug);
 }
 
 export function getAllComparisonSlugs(): string[] {
-  return comparisons.map(c => c.slug);
+  return comparisons.map((c) => c.slug);
 }

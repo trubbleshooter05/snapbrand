@@ -1,24 +1,27 @@
 import type { Metadata } from 'next'
+import { GuideJsonLd } from '@/components/GuideJsonLd'
 import SeoTemplatePage from '@/components/SeoTemplatePage'
+import { SITE_CONTENT_REVIEWED_ISO, SITE_URL, getDefaultArticleByline } from '@/lib/site'
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://snapbrand-snowy.vercel.app'
-).replace(/\/$/, '')
+const siteUrl = SITE_URL
+const META_DESC =
+  'Free brand identity template to define your logo, colors, fonts, and brand personality. Create a cohesive visual identity.'
 
 export const metadata: Metadata = {
   title: 'Brand Identity Template | Design Your Complete Brand',
-  description:
-    'Free brand identity template to define your logo, colors, fonts, and brand personality. Create a cohesive visual identity.',
+  description: META_DESC,
   openGraph: {
     title: 'Brand Identity Template | Design Your Complete Brand',
-    description:
-      'Free brand identity template to define your logo, colors, fonts, and brand personality. Create a cohesive visual identity.',
+    description: META_DESC,
     url: `${siteUrl}/brand-identity-template`,
     siteName: 'SnapBrand',
     type: 'website',
   },
   alternates: {
     canonical: `${siteUrl}/brand-identity-template`,
+  },
+  other: {
+    'article:modified_time': SITE_CONTENT_REVIEWED_ISO,
   },
 }
 
@@ -69,11 +72,19 @@ export default function BrandIdentityTemplatePage() {
   ]
 
   return (
-    <SeoTemplatePage
-      h1="Brand Identity Template"
-      intro="Build a strong, recognizable brand identity. This template helps you define your logo, colors, typography, and brand voice."
-      sections={sections}
-      relatedPages={relatedPages}
-    />
+    <>
+      <GuideJsonLd
+        path="/brand-identity-template"
+        headline="Brand Identity Template"
+        description={META_DESC}
+      />
+      <SeoTemplatePage
+        articleMeta={getDefaultArticleByline()}
+        h1="Brand Identity Template"
+        intro="Build a strong, recognizable brand identity. This template helps you define your logo, colors, typography, and brand voice."
+        sections={sections}
+        relatedPages={relatedPages}
+      />
+    </>
   )
 }

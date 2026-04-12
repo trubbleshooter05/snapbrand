@@ -1,4 +1,4 @@
-import SeoTemplatePage from "@/components/SeoTemplatePage";
+import { MarketingSeoPage } from "@/components/MarketingSeoPage";
 import {
   SEO_MARKETING_PAGES,
   metadataForSeoMarketingPage,
@@ -9,13 +9,5 @@ const def = SEO_MARKETING_PAGES["brand-kit-for-ecommerce"];
 export const metadata = metadataForSeoMarketingPage(def);
 
 export default function BrandKitForEcommercePage() {
-  return (
-    <SeoTemplatePage
-      eyebrow={def.eyebrow}
-      h1={def.h1}
-      intro={def.intro}
-      sections={def.sections}
-      relatedPages={def.relatedPages}
-    />
-  );
+  return <MarketingSeoPage def={def} />;
 }

@@ -1,24 +1,27 @@
 import type { Metadata } from 'next'
+import { GuideJsonLd } from '@/components/GuideJsonLd'
 import SeoTemplatePage from '@/components/SeoTemplatePage'
+import { SITE_CONTENT_REVIEWED_ISO, SITE_URL, getDefaultArticleByline } from '@/lib/site'
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://snapbrand-snowy.vercel.app'
-).replace(/\/$/, '')
+const siteUrl = SITE_URL
+const META_DESC =
+  'Free brand style guide template to document colors, fonts, icons, and UI patterns. Create design system standards.'
 
 export const metadata: Metadata = {
   title: 'Brand Style Guide Template | Design System Documentation',
-  description:
-    'Free brand style guide template to document colors, fonts, icons, and UI patterns. Create design system standards.',
+  description: META_DESC,
   openGraph: {
     title: 'Brand Style Guide Template | Design System Documentation',
-    description:
-      'Free brand style guide template to document colors, fonts, icons, and UI patterns. Create design system standards.',
+    description: META_DESC,
     url: `${siteUrl}/brand-style-guide-template`,
     siteName: 'SnapBrand',
     type: 'website',
   },
   alternates: {
     canonical: `${siteUrl}/brand-style-guide-template`,
+  },
+  other: {
+    'article:modified_time': SITE_CONTENT_REVIEWED_ISO,
   },
 }
 
@@ -70,11 +73,19 @@ export default function BrandStyleGuideTemplatePage() {
   ]
 
   return (
-    <SeoTemplatePage
-      h1="Brand Style Guide Template"
-      intro="Create comprehensive design system documentation with this brand style guide template. Define colors, typography, components, and patterns."
-      sections={sections}
-      relatedPages={relatedPages}
-    />
+    <>
+      <GuideJsonLd
+        path="/brand-style-guide-template"
+        headline="Brand Style Guide Template"
+        description={META_DESC}
+      />
+      <SeoTemplatePage
+        articleMeta={getDefaultArticleByline()}
+        h1="Brand Style Guide Template"
+        intro="Create comprehensive design system documentation with this brand style guide template. Define colors, typography, components, and patterns."
+        sections={sections}
+        relatedPages={relatedPages}
+      />
+    </>
   )
 }

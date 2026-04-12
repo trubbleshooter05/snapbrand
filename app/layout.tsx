@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackgroundMesh from "@/components/BackgroundMesh";
+import { JsonLd, organizationSchemaGraph } from "@/components/JsonLd";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,6 +24,9 @@ const siteUrl = (
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: `${siteUrl}/`,
+  },
   title:
     "SnapBrand — AI Brand Kit Generator | Create Your Brand in 60 Seconds",
   description:
@@ -61,6 +65,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <JsonLd data={organizationSchemaGraph()} />
         <BackgroundMesh />
         <Providers>
           <div className="flex flex-col min-h-screen">

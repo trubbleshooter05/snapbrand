@@ -1,24 +1,27 @@
 import type { Metadata } from 'next'
+import { GuideJsonLd } from '@/components/GuideJsonLd'
 import SeoTemplatePage from '@/components/SeoTemplatePage'
+import { SITE_CONTENT_REVIEWED_ISO, SITE_URL, getDefaultArticleByline } from '@/lib/site'
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://snapbrand-snowy.vercel.app'
-).replace(/\/$/, '')
+const siteUrl = SITE_URL
+const META_DESC =
+  'See real brand guidelines examples from top companies. Learn what makes great brand standards and how to create your own.'
 
 export const metadata: Metadata = {
   title: 'Brand Guidelines Examples | Real-World Templates',
-  description:
-    'See real brand guidelines examples from top companies. Learn what makes great brand standards and how to create your own.',
+  description: META_DESC,
   openGraph: {
     title: 'Brand Guidelines Examples | Real-World Templates',
-    description:
-      'See real brand guidelines examples from top companies. Learn what makes great brand standards and how to create your own.',
+    description: META_DESC,
     url: `${siteUrl}/brand-guidelines-examples`,
     siteName: 'SnapBrand',
     type: 'website',
   },
   alternates: {
     canonical: `${siteUrl}/brand-guidelines-examples`,
+  },
+  other: {
+    'article:modified_time': SITE_CONTENT_REVIEWED_ISO,
   },
 }
 
@@ -75,11 +78,19 @@ export default function BrandGuidelinesExamplesPage() {
   ]
 
   return (
-    <SeoTemplatePage
-      h1="Brand Guidelines Examples"
-      intro="Study real examples of professional brand guidelines from successful companies. Learn best practices and what makes effective brand standards."
-      sections={sections}
-      relatedPages={relatedPages}
-    />
+    <>
+      <GuideJsonLd
+        path="/brand-guidelines-examples"
+        headline="Brand Guidelines Examples"
+        description={META_DESC}
+      />
+      <SeoTemplatePage
+        articleMeta={getDefaultArticleByline()}
+        h1="Brand Guidelines Examples"
+        intro="Study real examples of professional brand guidelines from successful companies. Learn best practices and what makes effective brand standards."
+        sections={sections}
+        relatedPages={relatedPages}
+      />
+    </>
   )
 }

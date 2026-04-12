@@ -1,24 +1,27 @@
 import type { Metadata } from 'next'
+import { GuideJsonLd } from '@/components/GuideJsonLd'
 import SeoTemplatePage from '@/components/SeoTemplatePage'
+import { SITE_CONTENT_REVIEWED_ISO, SITE_URL, getDefaultArticleByline } from '@/lib/site'
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://snapbrand-snowy.vercel.app'
-).replace(/\/$/, '')
+const siteUrl = SITE_URL
+const META_DESC =
+  'Free brand book template to document your complete brand identity. Create professional brand standards in minutes.'
 
 export const metadata: Metadata = {
   title: 'Brand Book Template | Professional Brand Standards',
-  description:
-    'Free brand book template to document your complete brand identity. Create professional brand standards in minutes.',
+  description: META_DESC,
   openGraph: {
     title: 'Brand Book Template | Professional Brand Standards',
-    description:
-      'Free brand book template to document your complete brand identity. Create professional brand standards in minutes.',
+    description: META_DESC,
     url: `${siteUrl}/brand-book-template`,
     siteName: 'SnapBrand',
     type: 'website',
   },
   alternates: {
     canonical: `${siteUrl}/brand-book-template`,
+  },
+  other: {
+    'article:modified_time': SITE_CONTENT_REVIEWED_ISO,
   },
 }
 
@@ -71,11 +74,19 @@ export default function BrandBookTemplatePage() {
   ]
 
   return (
-    <SeoTemplatePage
-      h1="Brand Book Template"
-      intro="Create a professional brand book that tells your brand story and establishes design standards. This template includes everything from your mission to logo usage rules."
-      sections={sections}
-      relatedPages={relatedPages}
-    />
+    <>
+      <GuideJsonLd
+        path="/brand-book-template"
+        headline="Brand Book Template"
+        description={META_DESC}
+      />
+      <SeoTemplatePage
+        articleMeta={getDefaultArticleByline()}
+        h1="Brand Book Template"
+        intro="Create a professional brand book that tells your brand story and establishes design standards. This template includes everything from your mission to logo usage rules."
+        sections={sections}
+        relatedPages={relatedPages}
+      />
+    </>
   )
 }

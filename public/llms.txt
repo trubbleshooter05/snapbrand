@@ -1,0 +1,22 @@
+# SnapBrand
+
+> AI-assisted brand kit generator: logo directions, color palettes, typography, and short-form messaging from a text brief.
+
+- Site: https://snapbrand-snowy.vercel.app
+- Primary entry: https://snapbrand-snowy.vercel.app/
+- Pricing: https://snapbrand-snowy.vercel.app/pricing
+- Contact: https://snapbrand-snowy.vercel.app/contact
+- Privacy: https://snapbrand-snowy.vercel.app/privacy
+- Terms: https://snapbrand-snowy.vercel.app/terms
+
+## Editorial
+
+Long-form guides and comparisons are labeled with "SnapBrand Editorial Team" and a last-reviewed date on each page.
+
+## Machine-readable policies
+
+Use `/privacy` and `/terms` for data handling, acceptable use, and limitations.
+
+## Sitemap
+
+https://snapbrand-snowy.vercel.app/sitemap.xml

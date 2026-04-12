@@ -16,11 +16,25 @@ const SEO_COMPARE_LINKS = [
   { href: '/snapbrand-vs-hatchful', label: 'SnapBrand vs Hatchful' },
 ]
 
+const LEGAL_LINKS = [
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Service' },
+  { href: '/contact', label: 'Contact' },
+]
+
 export default function Footer() {
   return (
     <footer className="border-t border-white/10 bg-gray-950/90 mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:items-start">
+        <p className="text-xs text-gray-600 mb-8 max-w-2xl leading-relaxed">
+          SnapBrand uses industry-standard hosting and HTTPS. Payments (where applicable) are processed by established
+          providers; we do not store full card numbers on our application servers. See{' '}
+          <Link href="/privacy" className="text-gray-500 hover:text-gray-400 underline underline-offset-2">
+            Privacy
+          </Link>{' '}
+          for details.
+        </p>
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5 lg:items-start">
           <nav className="flex flex-col gap-2 text-sm text-gray-400">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Product</p>
             <Link href="/" className="hover:text-white transition-colors">
@@ -47,6 +61,14 @@ export default function Footer() {
           <nav className="flex flex-col gap-2 text-sm text-gray-400">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Compare</p>
             {SEO_COMPARE_LINKS.map(({ href, label }) => (
+              <Link key={href} href={href} className="hover:text-white transition-colors">
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <nav className="flex flex-col gap-2 text-sm text-gray-400">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Legal</p>
+            {LEGAL_LINKS.map(({ href, label }) => (
               <Link key={href} href={href} className="hover:text-white transition-colors">
                 {label}
               </Link>

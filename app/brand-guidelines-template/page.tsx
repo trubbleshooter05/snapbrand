@@ -1,24 +1,27 @@
 import type { Metadata } from 'next'
+import { GuideJsonLd } from '@/components/GuideJsonLd'
 import SeoTemplatePage from '@/components/SeoTemplatePage'
+import { SITE_CONTENT_REVIEWED_ISO, SITE_URL, getDefaultArticleByline } from '@/lib/site'
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://snapbrand-snowy.vercel.app'
-).replace(/\/$/, '')
+const siteUrl = SITE_URL
+const META_DESC =
+  'Free brand guidelines template to document your logo, colors, fonts, and messaging. Download now.'
 
 export const metadata: Metadata = {
   title: 'Brand Guidelines Template | Free Download',
-  description:
-    'Free brand guidelines template to document your logo, colors, fonts, and messaging. Download now.',
+  description: META_DESC,
   openGraph: {
     title: 'Brand Guidelines Template | Free Download',
-    description:
-      'Free brand guidelines template to document your logo, colors, fonts, and messaging. Download now.',
+    description: META_DESC,
     url: `${siteUrl}/brand-guidelines-template`,
     siteName: 'SnapBrand',
     type: 'website',
   },
   alternates: {
     canonical: `${siteUrl}/brand-guidelines-template`,
+  },
+  other: {
+    'article:modified_time': SITE_CONTENT_REVIEWED_ISO,
   },
 }
 
@@ -79,11 +82,19 @@ export default function BrandGuidelinesTemplatePage() {
   ]
 
   return (
-    <SeoTemplatePage
-      h1="Brand Guidelines Template"
-      intro="A complete template to document your brand's visual identity, voice, and messaging. Use this guide to ensure consistency across all your marketing materials."
-      sections={sections}
-      relatedPages={relatedPages}
-    />
+    <>
+      <GuideJsonLd
+        path="/brand-guidelines-template"
+        headline="Brand Guidelines Template"
+        description={META_DESC}
+      />
+      <SeoTemplatePage
+        articleMeta={getDefaultArticleByline()}
+        h1="Brand Guidelines Template"
+        intro="A complete template to document your brand's visual identity, voice, and messaging. Use this guide to ensure consistency across all your marketing materials."
+        sections={sections}
+        relatedPages={relatedPages}
+      />
+    </>
   )
 }

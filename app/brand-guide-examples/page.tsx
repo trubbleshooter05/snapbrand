@@ -1,24 +1,27 @@
 import type { Metadata } from 'next'
+import { GuideJsonLd } from '@/components/GuideJsonLd'
 import SeoTemplatePage from '@/components/SeoTemplatePage'
+import { SITE_CONTENT_REVIEWED_ISO, SITE_URL, getDefaultArticleByline } from '@/lib/site'
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://snapbrand-snowy.vercel.app'
-).replace(/\/$/, '')
+const siteUrl = SITE_URL
+const META_DESC =
+  'Browse brand guide examples to inspire your own. See how successful brands define their visual identity and messaging.'
 
 export const metadata: Metadata = {
   title: 'Brand Guide Examples | Inspire Your Brand Standards',
-  description:
-    'Browse brand guide examples to inspire your own. See how successful brands define their visual identity and messaging.',
+  description: META_DESC,
   openGraph: {
     title: 'Brand Guide Examples | Inspire Your Brand Standards',
-    description:
-      'Browse brand guide examples to inspire your own. See how successful brands define their visual identity and messaging.',
+    description: META_DESC,
     url: `${siteUrl}/brand-guide-examples`,
     siteName: 'SnapBrand',
     type: 'website',
   },
   alternates: {
     canonical: `${siteUrl}/brand-guide-examples`,
+  },
+  other: {
+    'article:modified_time': SITE_CONTENT_REVIEWED_ISO,
   },
 }
 
@@ -74,11 +77,19 @@ export default function BrandGuideExamplesPage() {
   ]
 
   return (
-    <SeoTemplatePage
-      h1="Brand Guide Examples"
-      intro="Explore how successful brands structure their brand guides. Get inspiration and learn best practices for creating your own comprehensive brand standards."
-      sections={sections}
-      relatedPages={relatedPages}
-    />
+    <>
+      <GuideJsonLd
+        path="/brand-guide-examples"
+        headline="Brand Guide Examples"
+        description={META_DESC}
+      />
+      <SeoTemplatePage
+        articleMeta={getDefaultArticleByline()}
+        h1="Brand Guide Examples"
+        intro="Explore how successful brands structure their brand guides. Get inspiration and learn best practices for creating your own comprehensive brand standards."
+        sections={sections}
+        relatedPages={relatedPages}
+      />
+    </>
   )
 }

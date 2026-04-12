@@ -1,24 +1,27 @@
 import type { Metadata } from 'next'
+import { GuideJsonLd } from '@/components/GuideJsonLd'
 import SeoTemplatePage from '@/components/SeoTemplatePage'
+import { SITE_CONTENT_REVIEWED_ISO, SITE_URL, getDefaultArticleByline } from '@/lib/site'
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://snapbrand-snowy.vercel.app'
-).replace(/\/$/, '')
+const siteUrl = SITE_URL
+const META_DESC =
+  'Professional brand guide template for startups and small businesses. Document colors, fonts, logo rules, and brand voice.'
 
 export const metadata: Metadata = {
   title: 'Brand Guide Template | Create Your Brand Standards',
-  description:
-    'Professional brand guide template for startups and small businesses. Document colors, fonts, logo rules, and brand voice.',
+  description: META_DESC,
   openGraph: {
     title: 'Brand Guide Template | Create Your Brand Standards',
-    description:
-      'Professional brand guide template for startups and small businesses. Document colors, fonts, logo rules, and brand voice.',
+    description: META_DESC,
     url: `${siteUrl}/brand-guide-template`,
     siteName: 'SnapBrand',
     type: 'website',
   },
   alternates: {
     canonical: `${siteUrl}/brand-guide-template`,
+  },
+  other: {
+    'article:modified_time': SITE_CONTENT_REVIEWED_ISO,
   },
 }
 
@@ -74,11 +77,19 @@ export default function BrandGuideTemplatePage() {
   ]
 
   return (
-    <SeoTemplatePage
-      h1="Brand Guide Template"
-      intro="Create a professional brand guide that ensures consistency across all your marketing materials. This template helps you document your logo, colors, typography, and brand voice."
-      sections={sections}
-      relatedPages={relatedPages}
-    />
+    <>
+      <GuideJsonLd
+        path="/brand-guide-template"
+        headline="Brand Guide Template"
+        description={META_DESC}
+      />
+      <SeoTemplatePage
+        articleMeta={getDefaultArticleByline()}
+        h1="Brand Guide Template"
+        intro="Create a professional brand guide that ensures consistency across all your marketing materials. This template helps you document your logo, colors, typography, and brand voice."
+        sections={sections}
+        relatedPages={relatedPages}
+      />
+    </>
   )
 }

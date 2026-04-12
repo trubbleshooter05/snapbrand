@@ -1,10 +1,9 @@
 /**
- * JsonLd — injects JSON-LD structured data into the page <head>.
- * Usage: <JsonLd data={schemaObject} />
- *
- * This is a Server Component (no 'use client') so it renders into <head>
- * via Next.js layout or page-level metadata.
+ * JsonLd — injects JSON-LD structured data (valid in document body).
+ * Server-only; use from Server Components or layouts.
  */
+
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 interface JsonLdProps {
   data: Record<string, unknown> | Record<string, unknown>[];
@@ -19,53 +18,66 @@ export function JsonLd({ data }: JsonLdProps) {
   );
 }
 
+// Re-export schema builders for convenience (single import path).
+export {
+  articleSchema,
+  breadcrumbListSchema,
+  comparisonArticleSchema,
+  organizationSchemaGraph,
+  softwareApplicationHomepageSchema,
+  webPageSchema,
+} from "@/lib/schema/jsonld-builders";
+
 // ─── Pre-built schema factories ───────────────────────────────────────────────
 
-const BASE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://snapbrand.io"
-).replace(/\/$/, "");
+const BASE_URL = SITE_URL;
 
 export function logoGeneratorSchema(slug: string, seoTitle: string, seoDescription: string) {
+  const pageUrl = `${BASE_URL}/logo-generator/${slug}`;
   return {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "SoftwareApplication",
-        "name": `SNAPBRAND — ${seoTitle}`,
-        "applicationCategory": "DesignApplication",
-        "description": seoDescription,
-        "url": `${BASE_URL}/logo-generator/${slug}`,
-        "offers": {
+        name: `${SITE_NAME} — ${seoTitle}`,
+        applicationCategory: "DesignApplication",
+        description: seoDescription,
+        url: pageUrl,
+        offers: {
           "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "description": "Free to start. Pro plans available."
+          price: "0",
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+          description: "Free to start. Pro plans available.",
         },
-        "operatingSystem": "Web",
-        "browserRequirements": "Requires JavaScript",
-        "publisher": {
+        operatingSystem: "Web",
+        browserRequirements: "Requires JavaScript",
+        publisher: {
           "@type": "Organization",
-          "name": "SNAPBRAND",
-          "url": BASE_URL
-        }
+          name: SITE_NAME,
+          url: BASE_URL,
+        },
       },
       {
         "@type": "WebPage",
-        "name": seoTitle,
-        "description": seoDescription,
-        "url": `${BASE_URL}/logo-generator/${slug}`,
-        "isPartOf": { "@type": "WebSite", "name": "SNAPBRAND", "url": BASE_URL },
-        "breadcrumb": {
+        name: seoTitle,
+        description: seoDescription,
+        url: pageUrl,
+        isPartOf: { "@type": "WebSite", name: SITE_NAME, url: BASE_URL },
+        breadcrumb: {
           "@type": "BreadcrumbList",
-          "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-            { "@type": "ListItem", "position": 2, "name": "Logo Generator", "item": `${BASE_URL}/logo-generator` },
-            { "@type": "ListItem", "position": 3, "name": seoTitle }
-          ]
-        }
-      }
-    ]
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: seoTitle,
+              item: pageUrl,
+            },
+          ],
+        },
+      },
+    ],
   };
 }
 
@@ -84,13 +96,15 @@ export function faqSchema(faqItems: { q: string; a: string }[]) {
   };
 }
 
+/** @deprecated Prefer organizationSchemaGraph from jsonld-builders via layout. */
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "SNAPBRAND",
-    "url": BASE_URL,
-    "description": "AI-powered logo and brand kit generator for small businesses and startups.",
-    "sameAs": []
+    name: SITE_NAME,
+    url: BASE_URL,
+    description:
+      "AI-powered brand kit generator for small businesses and startups.",
+    sameAs: [] as string[],
   };
 }

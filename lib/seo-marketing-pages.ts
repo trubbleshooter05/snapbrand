@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
+import { SITE_CONTENT_REVIEWED_ISO, SITE_URL } from "@/lib/site";
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://snapbrand-snowy.vercel.app"
-).replace(/\/$/, "");
+const siteUrl = SITE_URL;
 
 export type SeoMarketingSection = {
   title: string;
@@ -34,6 +33,9 @@ export function metadataForSeoMarketingPage(def: SeoMarketingPageDef): Metadata 
     },
     alternates: {
       canonical: url,
+    },
+    other: {
+      "article:modified_time": SITE_CONTENT_REVIEWED_ISO,
     },
   };
 }
@@ -293,9 +295,9 @@ export const SEO_MARKETING_PAGES: Record<string, SeoMarketingPageDef> = {
       "Choosing between SnapBrand vs Looka comes down to what you need first: a deeply editable logo build-out or a complete brand system you can apply across copy and channels. Looka popularized AI-assisted logo design with a guided quiz and optional brand kit purchases; many teams love it for iterating on mark shapes and business-card mocks. SnapBrand emphasizes end-to-end identity in a single generation—logo directions alongside palette, typography pairing, taglines, and brand voice so your story does not lag your visuals. If you already know you need stationery templates and fine-grained logo tweaking, test Looka’s editor. If you need a coherent brief you can ship to a website and campaigns today, run SnapBrand with your real positioning statement and compare outputs side by side.",
     sections: [
       {
-        title: "Where SnapBrand leads",
+        title: "When a single-pass kit may help",
         content:
-          "SnapBrand is strongest when you want a unified narrative: colors, fonts, and messaging generated from the same inputs so nothing feels bolted on. That helps founders who lack a copywriter and designers who need a creative direction before high-fidelity work. Multiple free generations let you explore divergent aesthetics before spending.",
+          "A unified first draft—colors, fonts, and messaging from the same brief—can reduce inconsistency when you are still exploring direction. That can help small teams without a dedicated copywriter or when you need a shared reference before higher-fidelity design work. Free-tier limits apply; check the product for current allowances.",
       },
       {
         title: "Where Looka shines",
@@ -327,9 +329,9 @@ export const SEO_MARKETING_PAGES: Record<string, SeoMarketingPageDef> = {
       "The SnapBrand vs Canva Brand Kit comparison is really generator versus repository. Canva’s Brand Kit is excellent once you already have a logo, hex codes, and fonts—it keeps teams on-template across decks, social posts, and print. It does not invent positioning, voice, or a coordinated system from a business description; you bring assets, Canva helps apply them. SnapBrand starts earlier in the journey: you describe your business and receive a generated identity direction you can iterate on, including messaging hooks. Many teams use both in sequence—SnapBrand to originate the system, Canva to scale creative production—so the question is less about rivalry and more about which job you are solving this week.",
     sections: [
       {
-        title: "When SnapBrand is the right first step",
+        title: "When an AI-generated draft may come first",
         content:
-          "Choose SnapBrand when you have a name and story but no finalized visuals, or when your current look is inconsistent and you want a fresh pass grounded in strategy-like prompts. It is built for speed and exploration without requiring design files upfront. You can generate multiple kits cheaply while you validate positioning.",
+          "If you have a name and story but no finalized visuals—or an inconsistent look you want to reset—a text-in, kit-out tool can produce a reference draft without existing brand files. Useful for exploration; always review outputs before production use. Pricing and limits vary by plan.",
       },
       {
         title: "When Canva Brand Kit earns its keep",
@@ -363,7 +365,7 @@ export const SEO_MARKETING_PAGES: Record<string, SeoMarketingPageDef> = {
       {
         title: "Output depth and iteration",
         content:
-          "Hatchful optimizes for quick selection among template families; iteration is largely within those bounds. SnapBrand lets you re-prompt with richer business context to explore divergent creative territories—still fast, but oriented toward system output rather than a single emblem. Consider how often you will refresh campaigns; systems age better than one-off logos without guidelines.",
+          "Template-led logo tools emphasize picking among families; iteration stays within that structure. Broader kit tools let you change the brief and regenerate when you need a different angle. Consider how often you will update campaigns—documented colors and type scales tend to be easier to reuse than a lone logo file without rules.",
       },
       {
         title: "Commerce workflows",

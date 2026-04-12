@@ -7,12 +7,20 @@ interface Section {
   content: string | string[]
 }
 
+interface ArticleBylineMeta {
+  author: string
+  dateModified: string
+  dateModifiedLabel: string
+}
+
 interface SeoTemplatePageProps {
   eyebrow?: string
   h1: string
   intro: string
   sections: Section[]
   relatedPages: { href: string; label: string }[]
+  /** Editorial byline + visible updated date (guides / SEO articles). */
+  articleMeta?: ArticleBylineMeta
 }
 
 export default function SeoTemplatePage({
@@ -21,6 +29,7 @@ export default function SeoTemplatePage({
   intro,
   sections,
   relatedPages,
+  articleMeta,
 }: SeoTemplatePageProps) {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -32,6 +41,17 @@ export default function SeoTemplatePage({
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
           {h1}
         </h1>
+        {articleMeta && (
+          <p className="text-sm text-gray-500 mb-6 -mt-2">
+            <span className="text-gray-400">{articleMeta.author}</span>
+            <span className="mx-2 text-gray-600" aria-hidden>
+              ·
+            </span>
+            <time dateTime={articleMeta.dateModified}>
+              Updated {articleMeta.dateModifiedLabel}
+            </time>
+          </p>
+        )}
         <p className="text-lg text-gray-400 leading-relaxed mb-8">{intro}</p>
 
         {/* Primary CTA - Above fold */}
