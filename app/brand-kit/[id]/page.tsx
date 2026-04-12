@@ -190,7 +190,7 @@ export default function BrandKitPage() {
         {colors.length > 0 && (
           <section>
             <SectionLabel>Color Palette</SectionLabel>
-            <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
               {colors.map(([role, color]) => (
                 <div key={role} className="group text-center">
                   <div
@@ -204,6 +204,77 @@ export default function BrandKitPage() {
                   <CopyButton text={color.hex} label={color.hex} />
                 </div>
               ))}
+            </div>
+
+            {kit?.color_contrast_summary && (
+              <div className="mt-8 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
+                  Contrast (approximate WCAG)
+                </p>
+                <ul className="grid sm:grid-cols-2 gap-2 text-sm text-gray-300">
+                  {Object.entries(kit.color_contrast_summary).map(([k, v]) => (
+                    <li key={k}>
+                      <span className="text-gray-500 capitalize">
+                        {k.replace(/_/g, ' ')}:{' '}
+                      </span>
+                      {v}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="mt-8">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
+                Palette in context
+              </p>
+              <div
+                className="rounded-2xl border border-white/10 overflow-hidden max-w-lg"
+                style={{
+                  backgroundColor: kit?.color_palette?.background?.hex ?? '#F8FAFC',
+                  color: kit?.color_palette?.text?.hex ?? '#0F172A',
+                }}
+              >
+                <div className="p-6">
+                  <p
+                    className="text-xs font-semibold uppercase tracking-wide mb-1 opacity-70"
+                    style={{ color: kit?.color_palette?.secondary?.hex }}
+                  >
+                    Preview
+                  </p>
+                  <h3
+                    className="text-2xl font-bold mb-2"
+                    style={{ fontFamily: heading ? `'${heading}', sans-serif` : undefined }}
+                  >
+                    {asset.brandName}
+                  </h3>
+                  <p
+                    className="text-sm mb-4 opacity-90"
+                    style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}
+                  >
+                    This mini layout shows how primary, text, and accent work on your background.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-md"
+                      style={{ backgroundColor: kit?.color_palette?.primary?.hex ?? primary }}
+                    >
+                      Primary CTA
+                    </button>
+                    <button
+                      type="button"
+                      className="px-4 py-2 rounded-lg text-sm font-semibold border-2 bg-transparent"
+                      style={{
+                        borderColor: kit?.color_palette?.accent?.hex ?? '#6366F1',
+                        color: kit?.color_palette?.accent?.hex ?? '#6366F1',
+                      }}
+                    >
+                      Secondary
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         )}

@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client'
 import { APIError, OpenAI } from 'openai'
 import { generateLogoSVG, generateWordmarkSVG } from '@/lib/generate-logo-svg'
 import { generateLogoSvgConcepts, type LogoSvgConcept } from '@/lib/logo-concepts-openai'
+import { buildContrastSummary, dedupePaletteColors, normalizeHex } from '@/lib/color-utils'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
@@ -88,11 +89,25 @@ export interface BrandKitData {
   }
   /** GPT-generated distinct SVG concepts (wordmark, lockup, lettermark, abstract). */
   logo_svg_concepts?: LogoSvgConcept[]
+  /** Computed WCAG contrast labels (server-side). */
+  color_contrast_summary?: {
+    text_on_background: string
+    primary_on_background: string
+    accent_on_background: string
+    text_on_primary: string
+  }
 }
 
 const SYSTEM_PROMPT = `You are an expert brand strategist and creative director.
 Generate a complete, comprehensive brand kit based on the business info provided.
 Return ONLY valid JSON — no markdown, no explanation, no backticks.
+
+COLOR PALETTE RULES (critical):
+- Exactly 5 colors in color_palette: primary, secondary, accent, background, text.
+- ALL 5 hex codes MUST be clearly distinct — no duplicates and no two colors that are nearly the same (vary hue and/or lightness so a human can tell them apart at a glance).
+- Do NOT use pure #000000 or pure #FFFFFF. Use a rich near-black for text (e.g. #0F172A, #1E293B) and a soft off-white or tinted light for backgrounds (e.g. #F8FAFC, #FAFAF9).
+- Structure: primary = main brand color; secondary = harmonious complement or analogous tone; accent = attention-grabbing CTA/highlight; background = main light UI surfaces; text = primary body/heading color on light backgrounds.
+- Ensure implied contrast: text on background should meet WCAG AA for body copy (aim for strong contrast).
 
 JSON shape:
 {
@@ -244,6 +259,25 @@ export async function POST(request: NextRequest) {
       kit = JSON.parse(kitResponse.choices[0].message.content ?? '{}') as BrandKitData
     } catch {
       return clientError('GPT-4o returned invalid JSON. Please try again.', 500)
+    }
+
+    if (kit.color_palette) {
+      const cp = kit.color_palette
+      const roles = ['primary', 'secondary', 'accent', 'background', 'text'] as const
+      for (const r of roles) {
+        const entry = cp[r]
+        if (entry?.hex) {
+          const n = normalizeHex(entry.hex)
+          if (n) entry.hex = n
+        }
+      }
+      dedupePaletteColors(kit as Parameters<typeof dedupePaletteColors>[0])
+      dedupePaletteColors(kit as Parameters<typeof dedupePaletteColors>[0])
+      try {
+        kit.color_contrast_summary = buildContrastSummary(kit as Parameters<typeof buildContrastSummary>[0])
+      } catch {
+        /* ignore */
+      }
     }
 
     const monogram = kit.logo_monogram ?? ({} as BrandKitData['logo_monogram'])
