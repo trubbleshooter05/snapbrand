@@ -5,12 +5,16 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import type { BrandKitData } from '@/app/api/generate/route'
 import type { LogoSvgConcept } from '@/lib/logo-concepts-openai'
+import { ColorHarmonyPreview } from '@/components/brand-kit/color-harmony-preview'
+import { GlassCard } from '@/components/brand-kit/glass-card'
+import { SectionShell } from '@/components/brand-kit/section-shell'
 import {
   getBrandColorOnPanel,
   getContrastRatio,
   getReadableTextColor,
   getReadableTextColorAny,
   isLightColor,
+  PANEL_UNDERLAY_HEX,
 } from '@/lib/colorUtils'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -154,6 +158,7 @@ export default function BrandKitPage() {
   const heading  = kit?.typography?.heading_font
   const body     = kit?.typography?.body_font
   const primary  = kit?.color_palette?.primary?.hex    ?? '#4F46E5'
+  const secondary = kit?.color_palette?.secondary?.hex  ?? '#6366F1'
   const accent   = kit?.color_palette?.accent?.hex     ?? '#6366F1'
   const bgColor  = kit?.color_palette?.background?.hex ?? '#F8FAFC'
   const textColor = kit?.color_palette?.text?.hex      ?? '#0A0A0F'
@@ -253,6 +258,8 @@ export default function BrandKitPage() {
 
   /** Text on variant cards / translucent panels (handles rgba card backgrounds). */
   const onPanel = getReadableTextColorAny(V.cardBg)
+  /** Text on frosted shell cards (Linear-style glass over page background). */
+  const onGlass = getReadableTextColor(PANEL_UNDERLAY_HEX)
 
   // Google Fonts — load 300 weight for editorial
   const googleFontsUrl = [heading, body].filter(Boolean).length
@@ -264,11 +271,24 @@ export default function BrandKitPage() {
 
   // ── Inner components (closures over brand data) ───────────────────────────
 
-  function SectionLabel({ children }: { children: React.ReactNode }) {
+  function SectionLabel({
+    children,
+    subtitle,
+  }: {
+    children: React.ReactNode
+    subtitle?: string
+  }) {
     return (
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500 mb-8">
-        {children}
-      </p>
+      <div className="mb-12 md:mb-16 max-w-3xl">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400">
+          {children}
+        </p>
+        {subtitle ? (
+          <p className="mt-4 text-sm font-normal tracking-[0.05em] text-white/60 leading-relaxed">
+            {subtitle}
+          </p>
+        ) : null}
+      </div>
     )
   }
 
@@ -304,7 +324,7 @@ export default function BrandKitPage() {
         >
           {monoLetter}
         </div>
-        <p className="text-xs text-zinc-500">{label}</p>
+        <p className="text-xs text-zinc-400">{label}</p>
       </div>
     )
   }
@@ -316,7 +336,7 @@ export default function BrandKitPage() {
       {googleFontsUrl && <link href={googleFontsUrl} rel="stylesheet" />}
 
       {/* Nav */}
-      <nav className="px-6 py-5 flex items-center justify-between border-b border-white/[0.04]">
+      <nav className="px-6 py-5 flex items-center justify-between border-b border-white/10">
         <Link href="/" className="text-[11px] text-gray-600 hover:text-white transition-colors tracking-wide">
           ← SnapBrand
         </Link>
@@ -568,8 +588,10 @@ export default function BrandKitPage() {
           SECTION 2 · WORDMARK
           Composition and alignment varies per variant.
       ════════════════════════════════════════════════════════════════════ */}
-      <section className="max-w-5xl mx-auto px-6 pt-16 md:pt-20 pb-16 md:pb-20">
-        <SectionLabel>Wordmark</SectionLabel>
+      <SectionShell>
+        <SectionLabel subtitle="Typography in context — light and dark surfaces.">
+          Wordmark
+        </SectionLabel>
 
         {/* BOLD — full-width stacked, uppercase, heavy */}
         {variant === 'bold' && (
@@ -689,16 +711,19 @@ export default function BrandKitPage() {
             ))}
           </div>
         )}
-      </section>
+      </SectionShell>
 
       {/* ════════════════════════════════════════════════════════════════════
           SECTION 3 · MONOGRAM MARK
           Variant-specific treatment: bold=sharp+heavy, editorial=outline,
           minimal=clean+geometric, friendly=circle+warm shadow
       ════════════════════════════════════════════════════════════════════ */}
-      <section className="max-w-5xl mx-auto px-6 py-16 md:py-20 border-t border-white/[0.05]">
-        <SectionLabel>Monogram mark</SectionLabel>
+      <SectionShell>
+        <SectionLabel subtitle="Mark variants for product, social, and print.">
+          Monogram mark
+        </SectionLabel>
 
+        <GlassCard className="p-8 md:p-10">
         <div className="flex flex-wrap items-end gap-10 md:gap-14">
           {variant === 'bold' && <>
             <MonoMark size={180} bg={primary} fg={onPrimary} label="Primary mark"
@@ -729,246 +754,304 @@ export default function BrandKitPage() {
             <MonoMark size={96} bg="#FFFFFF" fg={primary} label="On white" shape="circle" />
           </>}
         </div>
-      </section>
+        </GlassCard>
+      </SectionShell>
 
       {/* ════════════════════════════════════════════════════════════════════
-          SECTION 4 · REAL-WORLD MOCKUPS
-          3 large cards. Each mockup adapts to the active variant.
+          SECTION 4 · BRAND IN ACTION — showcase (stationery · digital · social)
       ════════════════════════════════════════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-6 py-16 md:py-20 border-t border-white/[0.05]">
-        <SectionLabel>Application preview</SectionLabel>
+      <SectionShell wide>
+        <SectionLabel subtitle="A single gallery of real-world surfaces — print, product, and social — in your system’s colors and type.">
+          Brand in action
+        </SectionLabel>
 
-        <div className="flex flex-col gap-10 md:gap-12">
-
-          {/* ── Website hero mockup (full width, largest) ── */}
-          <div style={{ borderRadius: V.cardRadius, border: `1px solid ${V.cardBorder}`, backgroundColor: V.cardBg, overflow: 'hidden' }}>
-            <div style={{ backgroundColor: bgColor, minHeight: 340, overflow: 'hidden' }}>
-              {/* Browser chrome */}
-              <div className="flex items-center gap-1.5 px-4 py-2.5"
-                style={{ borderBottom: `1px solid ${bgLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.07)'}` }}>
-                <div className="w-2 h-2 rounded-full bg-red-400/60" />
-                <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-                <div className="w-2 h-2 rounded-full bg-green-400/60" />
-                <div className="flex-1 mx-2 h-3.5 rounded px-2 flex items-center"
-                  style={{ backgroundColor: bgLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.07)' }}>
-                  <span className="text-[8px] opacity-35" style={{ color: onBg }}>
-                    {asset.brandName.toLowerCase().replace(/\s+/g, '')}.com
-                  </span>
-                </div>
-              </div>
-
-              {/* Navbar — variant-styled */}
-              <div className="flex items-center justify-between px-4 py-2.5"
-                style={{ borderBottom: bgLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)' }}>
-                <span className="font-bold text-xs truncate max-w-[200px]"
+        <div className="flex flex-col gap-16 md:gap-20">
+          {/** Subsection label — matches Wordmark / essentials cadence */}
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-500 mb-5 md:mb-6">
+              Stationery suite
+            </p>
+            <GlassCard className="overflow-hidden">
+              <div className="relative flex justify-center items-center min-h-[260px] md:min-h-[300px] px-8 py-14 md:py-16 bg-gradient-to-b from-white/[0.03] via-transparent to-transparent">
+                {/*
+                  Physical card: minimal rectangle, soft multi-layer shadow (no 3D tilt).
+                  Inset highlight + diffuse depth reads as paper on a dark surface.
+                */}
+                <div
+                  className="relative w-full max-w-[360px] aspect-[1.75/1] rounded-[3px] transition-transform duration-500 ease-out"
                   style={{
-                    ...HS, color: onBg,
-                    textTransform: variant === 'bold' ? 'uppercase' : 'none',
-                    letterSpacing: variant === 'bold' ? '0.06em' : 'normal',
-                    fontWeight: variant === 'bold' ? 900 : 600,
-                  }}>
-                  {asset.brandName}
-                </span>
-                <div className="flex gap-3">
-                  {(variant === 'editorial' ? ['Work', 'About', 'Reserve'] : ['Product', 'Pricing', 'About'])
-                    .map(l => (
-                      <span key={l} className="text-[10px] opacity-35" style={{ color: onBg }}>{l}</span>
-                    ))}
-                </div>
-              </div>
-
-              {/* Hero body — different per variant */}
-              {variant === 'bold' && (
-                <div className="flex" style={{ minHeight: 168 }}>
-                  <div className="w-2 shrink-0" style={{ backgroundColor: accent }} />
-                  <div className="flex-1 px-5 py-6 flex flex-col justify-between">
-                    <p className="font-black leading-tight break-words uppercase"
-                      style={{ ...HS, fontSize: 17, color: onBg, letterSpacing: '-0.01em' }}>
-                      {kit?.tagline_options?.[0] ?? asset.brandName}
-                    </p>
-                    <div className="mt-4">
-                      <span className="inline-block px-4 py-2 text-[10px] font-black uppercase tracking-wider transition hover:brightness-[0.92]"
-                        style={{ backgroundColor: primary, color: onPrimary, borderRadius: '3px' }}>
-                        Get Started
+                    backgroundColor: bgColor,
+                    boxShadow: `
+                      0 1px 0 rgba(255,255,255,0.35) inset,
+                      0 0 0 1px rgba(0,0,0,0.05),
+                      0 2px 4px rgba(0,0,0,0.04),
+                      0 8px 24px rgba(0,0,0,0.1),
+                      0 20px 50px rgba(0,0,0,0.14),
+                      0 40px 80px rgba(0,0,0,0.12)
+                    `,
+                  }}
+                >
+                  <div className="h-full flex flex-col justify-between p-6 md:p-7">
+                    <div className="flex items-center gap-2.5">
+                      {variant === 'editorial' && (
+                        <div className="w-px self-stretch min-h-[36px]" style={{ backgroundColor: primary }} />
+                      )}
+                      <div
+                        className="flex-shrink-0 flex items-center justify-center font-bold select-none transition-opacity duration-300"
+                        style={{
+                          width: 36,
+                          height: 36,
+                          backgroundColor: primary,
+                          color: onPrimary,
+                          fontSize: 15,
+                          fontWeight: 700,
+                          borderRadius: shapeRadius(monoShape, 36),
+                          clipPath: shapeClipPath(monoShape),
+                          ...HS,
+                        }}
+                      >
+                        {monoLetter}
+                      </div>
+                      <span
+                        className="font-bold text-[13px] truncate max-w-[180px] tracking-tight"
+                        style={{
+                          ...HS,
+                          color: onBg,
+                          textTransform: variant === 'bold' ? 'uppercase' : 'none',
+                          letterSpacing: variant === 'bold' ? '0.05em' : '-0.01em',
+                          fontWeight: variant === 'bold' ? 900 : 600,
+                        }}
+                      >
+                        {asset.brandName}
                       </span>
                     </div>
+                    <div>
+                      <p className="font-semibold text-[11px] mb-0.5 tracking-wide" style={{ ...HS, color: onBg }}>
+                        Alex Johnson
+                      </p>
+                      <p className="text-[9px] mb-2 opacity-50 leading-relaxed" style={{ ...BS, color: onBg }}>
+                        {variant === 'editorial' ? 'Creative Director' : variant === 'bold' ? 'Head Coach' : 'Founder & CEO'}
+                      </p>
+                      <p className="text-[8px] opacity-40 tracking-wide" style={{ ...BS, color: onBg }}>
+                        hello@{asset.brandName.toLowerCase().replace(/\s+/g, '')}.com
+                      </p>
+                    </div>
                   </div>
                 </div>
-              )}
-
-              {variant === 'editorial' && (
-                <div className="px-5 py-6">
-                  <div className="h-px w-6 mb-4" style={{ backgroundColor: primary }} />
-                  <p className="leading-snug mb-2 break-words"
-                    style={{ ...HS, fontSize: 14, fontWeight: 300, color: onBg, letterSpacing: '0.01em' }}>
-                    {kit?.tagline_options?.[0] ?? asset.brandName}
-                  </p>
-                  <p className="text-[8px] mb-4 opacity-38 leading-relaxed" style={{ ...BS, color: onBg }}>
-                    Crafted with intention. Built to endure.
-                  </p>
-                  <span className="text-[9px] font-medium" style={{
-                    color: getContrastRatio(bgColor, primary) >= 3 ? primary : onBg,
-                    ...BS,
-                  }}>
-                    Explore →
-                  </span>
-                </div>
-              )}
-
-              {variant === 'minimal' && (
-                <div className="px-5 py-6 text-center">
-                  <p className="font-bold leading-tight mb-2 break-words"
-                    style={{ ...HS, fontSize: 14, color: onBg, letterSpacing: '-0.02em' }}>
-                    {kit?.tagline_options?.[0] ?? asset.brandName}
-                  </p>
-                  <p className="text-[8px] mb-4 opacity-38 leading-relaxed" style={{ ...BS, color: onBg }}>
-                    Built for teams moving fast.
-                  </p>
-                  <span className="inline-block px-4 py-1.5 text-[9px] font-semibold transition hover:brightness-[0.92]"
-                    style={{ backgroundColor: primary, color: onPrimary, borderRadius: '999px' }}>
-                    Get Started
-                  </span>
-                </div>
-              )}
-
-              {variant === 'friendly' && (
-                <div className="px-5 py-6">
-                  <p className="font-bold leading-tight mb-2 break-words"
-                    style={{ ...HS, fontSize: 14, color: onBg, letterSpacing: '-0.01em', fontWeight: 800 }}>
-                    {kit?.tagline_options?.[0] ?? asset.brandName}
-                  </p>
-                  <p className="text-[8px] mb-4 opacity-38 leading-relaxed" style={{ ...BS, color: onBg }}>
-                    Something warm and genuinely helpful.
-                  </p>
-                  <span className="inline-block px-4 py-1.5 text-[9px] font-bold transition hover:brightness-[0.92]"
-                    style={{ backgroundColor: primary, color: onPrimary, borderRadius: '12px' }}>
-                    Get Started
-                  </span>
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-zinc-500 px-5 py-3 border-t border-white/[0.06]">Website hero</p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
-          {/* ── Social profile mockup ── */}
-          <div style={{ borderRadius: V.cardRadius, border: `1px solid ${V.cardBorder}`, backgroundColor: V.cardBg, overflow: 'hidden' }}>
-            <div className="flex flex-col items-center p-8" style={{ minHeight: 300, backgroundColor: V.cardBg }}>
-              {/* Avatar */}
-              <div className="flex items-center justify-center font-bold mb-4 select-none"
-                style={{
-                  width: 96, height: 96,
-                  backgroundColor: primary,
-                  color: onPrimary,
-                  fontSize: 42,
-                  fontWeight: variant === 'bold' ? 900 : 700,
-                  borderRadius: shapeRadius(monoShape, 96),
-                  clipPath: shapeClipPath(monoShape),
-                  boxShadow: variant === 'friendly' ? `0 8px 28px ${primary}44` : undefined,
-                  ...HS,
-                }}>
-                {monoLetter}
               </div>
-              <p className="font-bold text-base mb-1 text-center truncate max-w-[220px]"
-                style={{ ...HS, color: onPanel, textTransform: variant === 'bold' ? 'uppercase' : 'none', letterSpacing: variant === 'bold' ? '0.05em' : 'normal' }}>
-                {asset.brandName}
+              <p className="text-xs text-zinc-500 px-5 py-3 border-t border-white/10 tracking-wide">
+                Business card
               </p>
-              {kit?.tagline_options?.[0] && (
-                <p className="text-xs text-center mb-5 line-clamp-2 max-w-[220px]" style={{ ...BS, color: onPanel, opacity: 0.78 }}>
-                  {kit.tagline_options[0]}
-                </p>
-              )}
-              <button type="button" className="px-6 py-2 text-xs font-bold transition hover:brightness-[0.92]"
-                style={{ backgroundColor: primary, color: onPrimary, borderRadius: V.ctaRadius }}>
-                Follow
-              </button>
-              <div className="flex gap-8 mt-6 pt-5 w-full justify-center"
-                style={{ borderTop: `1px solid ${V.cardBorder}` }}>
-                {[['2.4k', 'Posts'], ['18k', 'Followers'], ['340', 'Following']].map(([n, l]) => (
-                  <div key={l} className="text-center">
-                    <p className="text-sm font-bold" style={{ color: onPanel }}>{n}</p>
-                    <p className="text-[10px] text-zinc-600">{l}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <p className="text-xs text-zinc-500 px-5 py-3 border-t border-white/[0.06]">Social profile</p>
+            </GlassCard>
           </div>
 
-          {/* ── Business card mockup ── */}
-          <div style={{ borderRadius: V.cardRadius, border: `1px solid ${V.cardBorder}`, backgroundColor: V.cardBg, overflow: 'hidden' }}>
-            <div className="flex items-center justify-center p-8" style={{ minHeight: 300 }}>
-              <div className="w-full shadow-2xl overflow-hidden"
-                style={{
-                  backgroundColor: bgColor,
-                  borderRadius: variant === 'bold' ? '6px' : variant === 'editorial' ? '6px' : '14px',
-                  aspectRatio: '1.75/1',
-                  maxWidth: 340,
-                }}>
-                <div className="h-full flex flex-col justify-between p-5">
-                  {/* Card header */}
-                  <div className="flex items-center gap-2">
-                    {variant === 'editorial' && (
-                      <div className="w-1 self-stretch" style={{ backgroundColor: primary }} />
-                    )}
-                    <div className="flex-shrink-0 flex items-center justify-center font-bold select-none"
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-500 mb-5 md:mb-6">
+              Digital presence
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              {/* Mobile app icon — rounded square (iOS-style radius), mark + brand-true color */}
+              <GlassCard className="overflow-hidden transition-opacity duration-300 hover:opacity-[0.98]">
+                <div className="flex flex-col items-center justify-center gap-8 py-12 md:py-14 px-6 bg-gradient-to-b from-white/[0.02] to-transparent">
+                  <div
+                    className="relative rounded-[22%] p-[3px] transition-shadow duration-300 ease-out"
+                    style={{
+                      background: `linear-gradient(145deg, rgba(255,255,255,0.22), rgba(255,255,255,0.04))`,
+                      boxShadow: `
+                        0 2px 8px rgba(0,0,0,0.2),
+                        0 12px 28px rgba(0,0,0,0.25),
+                        0 0 0 1px rgba(255,255,255,0.06) inset
+                      `,
+                    }}
+                  >
+                    <div
+                      className="flex items-center justify-center font-bold select-none rounded-[20%] w-[112px] h-[112px] sm:w-[120px] sm:h-[120px] transition-transform duration-300 ease-out"
                       style={{
-                        width: 32, height: 32,
                         backgroundColor: primary,
                         color: onPrimary,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        borderRadius: shapeRadius(monoShape, 32),
-                        clipPath: shapeClipPath(monoShape),
+                        fontSize: 46,
+                        fontWeight: variant === 'bold' ? 900 : 700,
+                        letterSpacing: '-0.03em',
                         ...HS,
-                      }}>
+                      }}
+                    >
                       {monoLetter}
                     </div>
-                    <span className="font-bold text-xs truncate max-w-[160px]"
+                  </div>
+                  <p className="text-[10px] uppercase tracking-[0.12em] text-zinc-500">Mobile app icon</p>
+                </div>
+                <p className="text-xs text-zinc-500 px-5 py-3 border-t border-white/10">Home screen</p>
+              </GlassCard>
+
+              {/* Website header — slim bar only; typography aligned to variant */}
+              <GlassCard className="overflow-hidden transition-opacity duration-300 hover:opacity-[0.98]">
+                <div
+                  className="border-b transition-colors duration-300"
+                  style={{
+                    backgroundColor: bgColor,
+                    borderColor: bgLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <div
+                    className="h-px w-full opacity-80"
+                    style={{ backgroundColor: accent, maxWidth: '100%' }}
+                  />
+                  <div className="flex items-center justify-between h-14 md:h-16 px-5 md:px-6">
+                    <span
+                      className="text-sm md:text-[15px] truncate max-w-[55%] transition-colors duration-300"
                       style={{
-                        ...HS, color: onBg,
+                        ...HS,
+                        color: onBg,
+                        fontWeight: variant === 'editorial' ? 400 : variant === 'bold' ? 900 : 600,
+                        letterSpacing: variant === 'bold' ? '0.06em' : variant === 'editorial' ? '0.02em' : '-0.02em',
                         textTransform: variant === 'bold' ? 'uppercase' : 'none',
-                        letterSpacing: variant === 'bold' ? '0.06em' : 'normal',
-                        fontWeight: variant === 'bold' ? 900 : 600,
-                      }}>
+                      }}
+                    >
                       {asset.brandName}
                     </span>
-                  </div>
-                  {/* Contact info */}
-                  <div>
-                    <p className="font-semibold text-[11px] mb-0.5" style={{ ...HS, color: onBg }}>
-                      Alex Johnson
-                    </p>
-                    <p className="text-[9px] mb-2 opacity-42" style={{ ...BS, color: onBg }}>
-                      {variant === 'editorial' ? 'Creative Director' : variant === 'bold' ? 'Head Coach' : 'Founder & CEO'}
-                    </p>
-                    <p className="text-[8px] opacity-32" style={{ ...BS, color: onBg }}>
-                      hello@{asset.brandName.toLowerCase().replace(/\s+/g, '')}.com
-                    </p>
+                    <div className="flex items-center gap-4 md:gap-5">
+                      {(variant === 'editorial' ? ['Work', 'About', 'Contact'] : ['Product', 'Pricing', 'About']).map(
+                        l => (
+                          <span
+                            key={l}
+                            className="text-[10px] md:text-[11px] transition-opacity duration-300 opacity-45 hover:opacity-80"
+                            style={{ color: onBg, ...BS }}
+                          >
+                            {l}
+                          </span>
+                        ),
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+                <div
+                  className="h-24 md:h-28 flex items-end px-5 md:px-6 pb-4"
+                  style={{
+                    backgroundColor: bgLight ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)',
+                  }}
+                >
+                  <p className="text-[10px] md:text-[11px] leading-relaxed max-w-md opacity-55" style={{ color: onBg, ...BS }}>
+                    {kit?.tagline_options?.[0] ?? 'Your positioning line sits here with calm hierarchy.'}
+                  </p>
+                </div>
+                <p className="text-xs text-zinc-500 px-5 py-3 border-t border-white/10">Website header</p>
+              </GlassCard>
             </div>
-            <p className="text-xs text-zinc-500 px-5 py-3 border-t border-white/[0.06]">Business card</p>
           </div>
 
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-500 mb-5 md:mb-6">
+              Social kit
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              {/* Avatar — profile focus, no metric clutter */}
+              <GlassCard className="overflow-hidden">
+                <div
+                  className="flex flex-col items-center text-center px-8 py-12 md:py-14 transition-opacity duration-300"
+                  style={{ backgroundColor: V.cardBg }}
+                >
+                  <div
+                    className="flex items-center justify-center font-bold mb-5 select-none transition-transform duration-300 ease-out shadow-lg"
+                    style={{
+                      width: 88,
+                      height: 88,
+                      backgroundColor: primary,
+                      color: onPrimary,
+                      fontSize: 38,
+                      fontWeight: variant === 'bold' ? 900 : 700,
+                      borderRadius: shapeRadius(monoShape, 88),
+                      clipPath: shapeClipPath(monoShape),
+                      boxShadow: `0 6px 20px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)`,
+                      ...HS,
+                    }}
+                  >
+                    {monoLetter}
+                  </div>
+                  <p
+                    className="font-semibold text-[15px] mb-1 truncate max-w-[240px]"
+                    style={{
+                      ...HS,
+                      color: onPanel,
+                      textTransform: variant === 'bold' ? 'uppercase' : 'none',
+                      letterSpacing: variant === 'bold' ? '0.05em' : 'normal',
+                    }}
+                  >
+                    {asset.brandName}
+                  </p>
+                  <p className="text-[11px] text-zinc-500 mb-1" style={BS}>
+                    @{asset.brandName.toLowerCase().replace(/\s+/g, '')}
+                  </p>
+                  {kit?.tagline_options?.[0] && (
+                    <p className="text-xs leading-relaxed max-w-[260px] line-clamp-2 opacity-75" style={{ ...BS, color: onPanel }}>
+                      {kit.tagline_options[0]}
+                    </p>
+                  )}
+                </div>
+                <p className="text-xs text-zinc-500 px-5 py-3 border-t border-white/10">Profile avatar</p>
+              </GlassCard>
+
+              {/* Social banner — wide cover strip */}
+              <GlassCard className="overflow-hidden">
+                <div
+                  className="relative w-full aspect-[21/9] min-h-[120px] md:min-h-[140px] overflow-hidden transition-opacity duration-300"
+                  style={{
+                    background: `linear-gradient(118deg, ${primary} 0%, ${accent} 55%, ${secondary} 100%)`,
+                  }}
+                >
+                  <div
+                    className="absolute -right-8 -top-10 text-[120px] md:text-[140px] font-black select-none pointer-events-none text-white/[0.14] leading-none"
+                    style={HS}
+                  >
+                    {monoLetter}
+                  </div>
+                  <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-6">
+                    <p
+                      className="text-lg md:text-xl font-semibold tracking-tight mb-1"
+                      style={{
+                        ...HS,
+                        color: getReadableTextColor(primary),
+                        textShadow: '0 2px 16px rgba(0,0,0,0.35)',
+                      }}
+                    >
+                      {asset.brandName}
+                    </p>
+                    {kit?.tagline_options?.[0] && (
+                      <p
+                        className="text-[11px] md:text-xs max-w-md leading-relaxed drop-shadow"
+                        style={{
+                          ...BS,
+                          color: getReadableTextColor(primary),
+                          textShadow: '0 1px 10px rgba(0,0,0,0.35)',
+                          opacity: 0.92,
+                        }}
+                      >
+                        {kit.tagline_options[0]}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-zinc-500 px-5 py-3 border-t border-white/10">Social banner</p>
+              </GlassCard>
+            </div>
           </div>
         </div>
-      </section>
+      </SectionShell>
 
       {/* ════════════════════════════════════════════════════════════════════
           SECTION 5 · BRAND ESSENTIALS
           Colors · Typography · Taglines — compact 3-col grid
       ════════════════════════════════════════════════════════════════════ */}
-      <section className="max-w-5xl mx-auto px-6 py-16 md:py-20 border-t border-white/[0.05]">
-        <SectionLabel>Brand essentials</SectionLabel>
+      <SectionShell>
+        <SectionLabel subtitle="Tokens you can ship — color roles, type pairing, and ready lines.">
+          Brand essentials
+        </SectionLabel>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
 
           {/* Colors */}
           {colors.length > 0 && (
-            <div style={{ borderRadius: V.cardRadius, border: `1px solid ${V.cardBorder}`, backgroundColor: V.cardBg, padding: '24px' }}>
-              <p className="text-xs font-medium text-zinc-500 mb-5">Colors</p>
+            <GlassCard className="p-6 md:p-7">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 mb-5">Palette roles</p>
               <div className="space-y-3">
                 {colors.map(([role, color]) => (
                   <div key={role} className="flex items-center gap-3">
@@ -976,110 +1059,111 @@ export default function BrandKitPage() {
                       style={{
                         width: 38, height: 38,
                         backgroundColor: color.hex,
-                        borderRadius: variant === 'bold' ? '5px' : variant === 'friendly' ? '12px' : '8px',
+                        borderRadius: '12px',
                       }} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold capitalize truncate" style={{ color: onPanel }}>{role}</p>
-                      <p className="text-[10px] text-gray-600 truncate">{color.name}</p>
+                      <p className="text-xs font-semibold capitalize truncate" style={{ color: onGlass }}>{role}</p>
+                      <p className="text-[10px] text-zinc-500 truncate">{color.name}</p>
                     </div>
                     <CopyButton text={color.hex} label={color.hex} />
                   </div>
                 ))}
               </div>
-            </div>
+              <ColorHarmonyPreview
+                brandName={asset.brandName}
+                background={bgColor}
+                text={textColor}
+                primary={primary}
+                secondary={secondary}
+                accent={accent}
+                bodyStyle={BS}
+              />
+            </GlassCard>
           )}
 
           {/* Typography */}
           {kit?.typography && (
-            <div style={{ borderRadius: V.cardRadius, border: `1px solid ${V.cardBorder}`, backgroundColor: V.cardBg, padding: '24px' }}>
-              <p className="text-xs font-medium text-zinc-500 mb-5">Typography</p>
+            <GlassCard className="p-6 md:p-7">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 mb-5">Typography</p>
               <div className="space-y-5">
                 <div>
-                  <p className="text-[9px] text-gray-600 uppercase tracking-wider mb-2">Heading</p>
-                  <p className="text-5xl leading-none" style={{ ...HS, fontWeight: V.nameWeight, color: onPanel }}>Aa</p>
-                  <p className="text-xs text-gray-400 mt-2 break-words" style={HS}>{heading ?? 'System UI'}</p>
-                  <p className="text-[10px] text-gray-700 mt-1" style={HS}>ABCDEFG abcdefg 01234</p>
+                  <p className="text-[9px] text-zinc-500 uppercase tracking-[0.05em] mb-2">Heading</p>
+                  <p className="text-5xl leading-none" style={{ ...HS, fontWeight: V.nameWeight, color: onGlass }}>Aa</p>
+                  <p className="text-xs text-zinc-400 mt-2 break-words" style={HS}>{heading ?? 'System UI'}</p>
+                  <p className="text-[10px] text-zinc-500 mt-1" style={HS}>ABCDEFG abcdefg 01234</p>
                 </div>
-                <div style={{ borderTop: `1px solid ${V.cardBorder}`, paddingTop: '20px' }}>
-                  <p className="text-[9px] text-gray-600 uppercase tracking-wider mb-2">Body</p>
-                  <p className="text-4xl leading-none" style={{ ...BS, color: onPanel }}>Aa</p>
-                  <p className="text-xs text-gray-400 mt-2 break-words" style={BS}>{body ?? 'System UI'}</p>
-                  <p className="text-[10px] text-gray-700 mt-1 leading-relaxed" style={BS}>The quick brown fox</p>
+                <div className="border-t border-white/10 pt-5">
+                  <p className="text-[9px] text-zinc-500 uppercase tracking-[0.05em] mb-2">Body</p>
+                  <p className="text-4xl leading-none" style={{ ...BS, color: onGlass }}>Aa</p>
+                  <p className="text-xs text-zinc-400 mt-2 break-words" style={BS}>{body ?? 'System UI'}</p>
+                  <p className="text-[10px] text-zinc-500 mt-1 leading-relaxed" style={BS}>The quick brown fox</p>
                 </div>
               </div>
-            </div>
+            </GlassCard>
           )}
 
           {/* Taglines */}
           {(kit?.tagline_options?.length ?? 0) > 0 && (
-            <div style={{ borderRadius: V.cardRadius, border: `1px solid ${V.cardBorder}`, backgroundColor: V.cardBg, padding: '24px' }}>
-              <p className="text-xs font-medium text-zinc-500 mb-5">Taglines</p>
+            <GlassCard className="p-6 md:p-7">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 mb-5">Taglines</p>
               <div className="space-y-3">
                 {kit!.tagline_options.slice(0, 3).map((t, i) => (
                   <button key={i}
                     onClick={() => navigator.clipboard.writeText(t)}
-                    className="w-full text-left group"
-                    style={{
-                      padding: '12px',
-                      borderRadius: variant === 'bold' ? '5px' : variant === 'friendly' ? '14px' : '10px',
-                      border: `1px solid ${V.cardBorder}`,
-                      backgroundColor: 'transparent',
-                      transition: 'border-color 0.15s',
-                    }}>
-                    <p className="text-sm leading-snug" style={{ ...HS, color: onPanel }}>{t}</p>
-                    <p className="text-[9px] text-gray-700 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    className="w-full text-left group rounded-xl border border-white/10 bg-white/[0.02] px-3 py-3 transition hover:border-white/20"
+                  >
+                    <p className="text-sm leading-snug" style={{ ...HS, color: onGlass }}>{t}</p>
+                    <p className="text-[9px] text-zinc-500 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                       Click to copy
                     </p>
                   </button>
                 ))}
               </div>
-            </div>
+            </GlassCard>
           )}
 
         </div>
-      </section>
+      </SectionShell>
 
       {/* ════════════════════════════════════════════════════════════════════
           SECTION 6 · BRAND STRATEGY & VOICE — collapsed, below fold
       ════════════════════════════════════════════════════════════════════ */}
       {(kit?.brand_strategy || kit?.brand_voice) && (
-        <section className="max-w-5xl mx-auto px-6 py-10"
-          style={{ borderTop: `1px solid rgba(255,255,255,0.04)` }}>
+        <SectionShell className="!py-16 md:!py-24">
           <details className="group">
-            <summary className="flex items-center justify-between cursor-pointer list-none select-none py-3 rounded-lg hover:bg-white/[0.03] px-1 -mx-1 transition-colors">
-              <p className="text-sm font-medium text-zinc-400">
+            <summary className="flex items-center justify-between cursor-pointer list-none select-none py-3 rounded-xl hover:bg-white/[0.03] px-2 -mx-2 transition-colors border border-transparent hover:border-white/10">
+              <p className="text-sm font-medium tracking-[0.05em] text-zinc-300">
                 Strategy, voice &amp; directions
               </p>
               <span className="text-zinc-500 text-sm transition-transform group-open:rotate-180">↓</span>
             </summary>
 
-            <div className="mt-8 space-y-10">
+            <div className="mt-10 space-y-12">
 
               {kit?.brand_strategy && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-700 mb-5">Strategy</p>
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 mb-6">Strategy</p>
+                  <div className="grid sm:grid-cols-2 gap-4 md:gap-5">
                     {[
                       { label: 'Positioning',     val: kit.brand_strategy.positioning },
                       { label: 'Target Audience',  val: kit.brand_strategy.target_audience },
                       { label: 'Unique Value',     val: kit.brand_strategy.unique_value_prop },
                       { label: 'Tone of Voice',    val: kit.brand_strategy.tone_of_voice },
                     ].filter(x => x.val).map(({ label, val }) => (
-                      <div key={label} style={{ backgroundColor: V.cardBg, border: `1px solid ${V.cardBorder}`, borderRadius: V.cardRadius, padding: '20px' }}>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wider mb-2">{label}</p>
-                        <p className="text-gray-400 text-sm leading-relaxed">{val}</p>
-                      </div>
+                      <GlassCard key={label} className="p-5 md:p-6">
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.05em] mb-2">{label}</p>
+                        <p className="text-zinc-400 text-sm leading-relaxed">{val}</p>
+                      </GlassCard>
                     ))}
                     {(kit.brand_strategy.brand_personality?.length ?? 0) > 0 && (
-                      <div className="sm:col-span-2"
-                        style={{ backgroundColor: V.cardBg, border: `1px solid ${V.cardBorder}`, borderRadius: V.cardRadius, padding: '20px' }}>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wider mb-3">Personality</p>
+                      <GlassCard className="sm:col-span-2 p-5 md:p-6">
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.05em] mb-3">Personality</p>
                         <div className="flex flex-wrap gap-2">
                           {kit.brand_strategy.brand_personality.map(t => (
                             <span key={t} className="px-3 py-1 text-xs font-medium"
                               style={{
                                 backgroundColor: `${primary}14`,
-                                color: getBrandColorOnPanel(primary, V.cardBg),
+                                color: getBrandColorOnPanel(primary, PANEL_UNDERLAY_HEX),
                                 border: `1px solid ${primary}32`,
                                 borderRadius: V.personalityRadius,
                               }}>
@@ -1087,7 +1171,7 @@ export default function BrandKitPage() {
                             </span>
                           ))}
                         </div>
-                      </div>
+                      </GlassCard>
                     )}
                   </div>
                 </div>
@@ -1095,33 +1179,32 @@ export default function BrandKitPage() {
 
               {kit?.brand_voice && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-700 mb-5">Voice</p>
-                  <div style={{ backgroundColor: V.cardBg, border: `1px solid ${V.cardBorder}`, borderRadius: V.cardRadius, padding: '24px' }}
-                    className="space-y-5">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 mb-6">Voice</p>
+                  <GlassCard className="p-6 md:p-7 space-y-6">
                     {kit.brand_voice.tone && (
                       <div>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase mb-1">Tone</p>
-                        <p className="font-medium text-sm" style={{ color: onPanel }}>{kit.brand_voice.tone}</p>
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.05em] mb-1">Tone</p>
+                        <p className="font-medium text-sm" style={{ color: onGlass }}>{kit.brand_voice.tone}</p>
                       </div>
                     )}
                     {kit.brand_voice.personality && (
                       <div>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase mb-1">Personality</p>
-                        <p className="text-gray-400 text-sm leading-relaxed" style={BS}>{kit.brand_voice.personality}</p>
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.05em] mb-1">Personality</p>
+                        <p className="text-zinc-400 text-sm leading-relaxed" style={BS}>{kit.brand_voice.personality}</p>
                       </div>
                     )}
                     {kit.brand_voice.tone_examples && (
                       <div>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase mb-3">Voice in practice</p>
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase mb-3 tracking-[0.05em]">Voice in practice</p>
                         <div className="grid gap-3 md:grid-cols-3">
                           {[
                             { label: 'Social',    val: kit.brand_voice.tone_examples.social_post },
                             { label: 'Email',     val: kit.brand_voice.tone_examples.email_subject },
                             { label: 'Headline',  val: kit.brand_voice.tone_examples.tagline_or_headline },
                           ].filter(x => x.val).map(({ label, val }) => (
-                            <div key={label} style={{ padding: '16px', backgroundColor: 'rgba(255,255,255,0.025)', border: `1px solid ${V.cardBorder}`, borderRadius: '10px' }}>
-                              <p className="text-[9px] text-gray-600 uppercase tracking-wider mb-2">{label}</p>
-                              <p className="text-sm text-gray-300 leading-relaxed" style={BS}>{val}</p>
+                            <div key={label} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                              <p className="text-[9px] text-zinc-500 uppercase tracking-[0.05em] mb-2">{label}</p>
+                              <p className="text-sm text-zinc-300 leading-relaxed" style={BS}>{val}</p>
                             </div>
                           ))}
                         </div>
@@ -1129,34 +1212,34 @@ export default function BrandKitPage() {
                     )}
                     {!kit.brand_voice.tone_examples && kit.brand_voice.sample_copy && (
                       <div>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase mb-2">Example copy</p>
-                        <div style={{ padding: '20px', borderLeft: `4px solid ${primary}`, backgroundColor: 'rgba(255,255,255,0.025)', borderRadius: '0 8px 8px 0' }}>
-                          <p className="text-base italic text-gray-300" style={BS}>&ldquo;{kit.brand_voice.sample_copy}&rdquo;</p>
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.05em] mb-2">Example copy</p>
+                        <div className="p-5 rounded-xl bg-white/[0.02]" style={{ borderLeft: `4px solid ${primary}` }}>
+                          <p className="text-base italic text-zinc-300" style={BS}>&ldquo;{kit.brand_voice.sample_copy}&rdquo;</p>
                         </div>
                       </div>
                     )}
                     {(kit.brand_voice.brand_donts?.length ?? 0) > 0 && (
                       <div>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase mb-2">Brand don&rsquo;ts</p>
-                        <ul className="space-y-1 text-sm text-gray-500 list-disc list-inside">
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.05em] mb-2">Brand don&rsquo;ts</p>
+                        <ul className="space-y-1 text-sm text-zinc-500 list-disc list-inside">
                           {kit.brand_voice.brand_donts?.map((d, i) => <li key={i}>{d}</li>)}
                         </ul>
                       </div>
                     )}
-                  </div>
+                  </GlassCard>
                 </div>
               )}
 
               {!kit?.logo_svg_concepts?.length && (kit?.logo_concepts?.length ?? 0) > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-700 mb-5">Logo Concept Directions</p>
-                  <div className="grid md:grid-cols-3 gap-4">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 mb-6">Logo concept directions</p>
+                  <div className="grid md:grid-cols-3 gap-4 md:gap-5">
                     {kit!.logo_concepts.map((concept, i) => (
-                      <div key={i} style={{ backgroundColor: V.cardBg, border: `1px solid ${V.cardBorder}`, borderRadius: V.cardRadius, padding: '20px' }}>
+                      <GlassCard key={i} className="p-5 md:p-6">
                         <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold mb-3"
                           style={{ backgroundColor: primary, color: onPrimary }}>{i + 1}</div>
-                        <p className="text-sm text-gray-400 leading-relaxed">{concept}</p>
-                      </div>
+                        <p className="text-sm text-zinc-400 leading-relaxed">{concept}</p>
+                      </GlassCard>
                     ))}
                   </div>
                 </div>
@@ -1164,12 +1247,11 @@ export default function BrandKitPage() {
 
             </div>
           </details>
-        </section>
+        </SectionShell>
       )}
 
       {/* CTA footer */}
-      <section className="max-w-5xl mx-auto px-6 py-16"
-        style={{ borderTop: `1px solid rgba(255,255,255,0.04)` }}>
+      <section className="max-w-5xl mx-auto border-t border-white/10 px-6 py-16 md:py-20">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/"
             className="px-8 py-3 text-sm font-bold transition duration-150 hover:brightness-[0.92] active:brightness-[0.85]"

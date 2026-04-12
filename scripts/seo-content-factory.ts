@@ -1,7 +1,10 @@
 /**
  * Manual SEO content factory — generates review-only JSON matching
  * app/logo-generator/[business-type]/config.ts (plus `slug`).
- * Does not modify config.ts. Run: npm run seo:factory
+ * Does not modify config.ts.
+ *
+ * Run (do not paste shell comments into npm): `npm run seo:factory`
+ * Extra slugs: `npm run seo:factory -- coffee-shop podcast`
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
