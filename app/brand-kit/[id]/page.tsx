@@ -5,6 +5,13 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import type { BrandKitData } from '@/app/api/generate/route'
 import type { LogoSvgConcept } from '@/lib/logo-concepts-openai'
+import {
+  getBrandColorOnPanel,
+  getContrastRatio,
+  getReadableTextColor,
+  getReadableTextColorAny,
+  isLightColor,
+} from '@/lib/colorUtils'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -21,14 +28,6 @@ interface Asset {
 type Variant = 'bold' | 'minimal' | 'editorial' | 'friendly'
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
-
-function isLight(hex: string): boolean {
-  const h = hex.replace('#', '')
-  const r = parseInt(h.slice(0, 2), 16)
-  const g = parseInt(h.slice(2, 4), 16)
-  const b = parseInt(h.slice(4, 6), 16)
-  return (r * 299 + g * 587 + b * 114) / 1000 > 128
-}
 
 /**
  * Scores brand signals against 4 visual style systems.
@@ -157,8 +156,16 @@ export default function BrandKitPage() {
   const primary  = kit?.color_palette?.primary?.hex    ?? '#4F46E5'
   const accent   = kit?.color_palette?.accent?.hex     ?? '#6366F1'
   const bgColor  = kit?.color_palette?.background?.hex ?? '#F8FAFC'
-  const textColor = kit?.color_palette?.text?.hex      ?? '#0F172A'
+  const textColor = kit?.color_palette?.text?.hex      ?? '#0A0A0F'
   const colors   = kit?.color_palette ? Object.entries(kit.color_palette) : []
+
+  const BOLD_DARK_BG = '#0F0F0F'
+  const EDIT_DARK_BG = '#0C0C10'
+  const MIN_DARK_BG = '#0F0F14'
+  const onBg = getReadableTextColor(bgColor)
+  const onDarkBold = getReadableTextColor(BOLD_DARK_BG)
+  const onDarkEdit = getReadableTextColor(EDIT_DARK_BG)
+  const onDarkMin = getReadableTextColor(MIN_DARK_BG)
 
   const personality = (kit?.brand_strategy?.brand_personality ?? []).join(' ').toLowerCase()
   const isFriendly  = personality.includes('friendly') || personality.includes('warm')
@@ -177,10 +184,12 @@ export default function BrandKitPage() {
   const HS = heading ? { fontFamily: `'${heading}', serif` } : {}
   const BS = body    ? { fontFamily: `'${body}', sans-serif` } : {}
 
-  // Color derivations
-  const onPrimary = isLight(primary) ? textColor : '#FFFFFF'
-  const onAccent  = isLight(accent)  ? textColor : '#FFFFFF'
-  const bgLight   = isLight(bgColor)
+  // Color derivations — system contrast (never hardcode light/dark text on brand colors)
+  const onPrimary = getReadableTextColor(primary)
+  const onAccent = getReadableTextColor(accent)
+  const bgLight = isLightColor(bgColor)
+  const glyphOnDark =
+    getContrastRatio(textColor, bgColor) >= 3 ? bgColor : getReadableTextColor(textColor)
 
   // ── Variant design tokens ─────────────────────────────────────────────────
   // Each variant gets its own coherent set of design decisions.
@@ -241,6 +250,9 @@ export default function BrandKitPage() {
       }
     }
   })()
+
+  /** Text on variant cards / translucent panels (handles rgba card backgrounds). */
+  const onPanel = getReadableTextColorAny(V.cardBg)
 
   // Google Fonts — load 300 weight for editorial
   const googleFontsUrl = [heading, body].filter(Boolean).length
@@ -363,7 +375,7 @@ export default function BrandKitPage() {
               </p>
             )}
             <div className="flex flex-wrap items-center gap-3">
-              <button type="button" className="px-8 py-3 text-[11px] font-black uppercase tracking-widest"
+              <button type="button" className="px-8 py-3 text-[11px] font-black uppercase tracking-widest transition duration-150 hover:brightness-[0.92] active:brightness-[0.85]"
                 style={{ backgroundColor: accent, color: onAccent, borderRadius: '3px' }}>
                 Get Started
               </button>
@@ -394,7 +406,7 @@ export default function BrandKitPage() {
               className="absolute pointer-events-none select-none font-bold"
               style={{
                 fontSize: '18rem',
-                color: isLight(primary) ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)',
+                color: isLightColor(primary) ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)',
                 lineHeight: 1,
                 ...HS,
               }}
@@ -403,7 +415,7 @@ export default function BrandKitPage() {
             </div>
             <div className="absolute bottom-10 left-10">
               <p className="text-[9px] uppercase tracking-[0.45em]"
-                style={{ color: isLight(primary) ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.28)' }}>
+                style={{ color: isLightColor(primary) ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.28)' }}>
                 Identity System
               </p>
             </div>
@@ -435,7 +447,10 @@ export default function BrandKitPage() {
               </h1>
               {kit?.tagline_options?.[0] && (
                 <p className="mt-7 text-[10px] uppercase tracking-[0.42em]"
-                  style={{ color: primary, ...BS }}>
+                  style={{
+                    color: getContrastRatio('#0A0A0F', primary) >= 4.5 ? primary : '#FFFFFF',
+                    ...BS,
+                  }}>
                   {kit.tagline_options[0]}
                 </p>
               )}
@@ -486,7 +501,7 @@ export default function BrandKitPage() {
               </p>
             )}
             <div className="flex items-center justify-center flex-wrap gap-3">
-              <button type="button" className="px-8 py-3 text-sm font-semibold"
+              <button type="button" className="px-8 py-3 text-sm font-semibold transition duration-150 hover:brightness-[0.92] active:brightness-[0.85]"
                 style={{ backgroundColor: primary, color: onPrimary, borderRadius: '999px' }}>
                 Get Started
               </button>
@@ -536,7 +551,7 @@ export default function BrandKitPage() {
             )}
             <div className="flex items-center justify-center flex-wrap gap-3">
               <button type="button" className="px-8 py-3.5 text-sm font-bold shadow-lg"
-                style={{ backgroundColor: 'rgba(255,255,255,0.95)', color: textColor, borderRadius: '14px' }}>
+                style={{ backgroundColor: 'rgba(255,255,255,0.95)', color: getReadableTextColor('#FFFFFF'), borderRadius: '14px' }}>
                 Get Started
               </button>
               <button type="button"
@@ -560,8 +575,8 @@ export default function BrandKitPage() {
         {variant === 'bold' && (
           <div className="space-y-3">
             {[
-              { bg: bgColor, nameColor: textColor, label: 'Light background' },
-              { bg: '#0F0F0F', nameColor: '#FFFFFF', label: 'Dark background' },
+              { bg: bgColor, nameColor: onBg, label: 'Light background' },
+              { bg: BOLD_DARK_BG, nameColor: onDarkBold, label: 'Dark background' },
             ].map(({ bg, nameColor, label }) => (
               <div key={label} className="relative overflow-hidden"
                 style={{ backgroundColor: bg, borderRadius: '10px', padding: '52px 44px 44px' }}>
@@ -600,8 +615,8 @@ export default function BrandKitPage() {
         {variant === 'editorial' && (
           <div className="space-y-4">
             {[
-              { bg: bgColor, nameColor: textColor, label: 'Light background' },
-              { bg: '#0C0C10', nameColor: '#F5F5F0', label: 'Dark background' },
+              { bg: bgColor, nameColor: onBg, label: 'Light background' },
+              { bg: EDIT_DARK_BG, nameColor: onDarkEdit, label: 'Dark background' },
             ].map(({ bg, nameColor, label }) => (
               <div key={label}
                 style={{ backgroundColor: bg, borderRadius: '16px', padding: '60px 52px 52px' }}>
@@ -638,8 +653,8 @@ export default function BrandKitPage() {
         {(variant === 'minimal' || variant === 'friendly') && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              { bg: bgColor, nameColor: textColor, label: 'Light background' },
-              { bg: '#0F0F14', nameColor: '#F0F0F0', label: 'Dark background' },
+              { bg: bgColor, nameColor: onBg, label: 'Light background' },
+              { bg: MIN_DARK_BG, nameColor: onDarkMin, label: 'Dark background' },
             ].map(({ bg, nameColor, label }) => (
               <div key={label}
                 className="flex flex-col justify-between"
@@ -696,14 +711,14 @@ export default function BrandKitPage() {
           {variant === 'editorial' && <>
             <MonoMark size={160} bg={primary} fg={onPrimary} label="Primary mark" shape="circle" />
             <MonoMark size={96} bg={primary} fg={onPrimary} outline label="Outline mark" shape="circle" />
-            <MonoMark size={96} bg={textColor} fg={bgColor} label="Dark variant" shape="circle" />
+            <MonoMark size={96} bg={textColor} fg={glyphOnDark} label="Dark variant" shape="circle" />
           </>}
 
           {variant === 'minimal' && <>
             <MonoMark size={160} bg={primary} fg={onPrimary} label="Primary mark"
               shadow="0 8px 32px rgba(0,0,0,0.35)" />
             <MonoMark size={96} bg={primary} fg={onPrimary} label="App icon" />
-            <MonoMark size={96} bg={textColor} fg={bgColor} label="Dark variant" />
+            <MonoMark size={96} bg={textColor} fg={glyphOnDark} label="Dark variant" />
           </>}
 
           {variant === 'friendly' && <>
@@ -736,7 +751,7 @@ export default function BrandKitPage() {
                 <div className="w-2 h-2 rounded-full bg-green-400/60" />
                 <div className="flex-1 mx-2 h-3.5 rounded px-2 flex items-center"
                   style={{ backgroundColor: bgLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.07)' }}>
-                  <span className="text-[8px] opacity-35" style={{ color: textColor }}>
+                  <span className="text-[8px] opacity-35" style={{ color: onBg }}>
                     {asset.brandName.toLowerCase().replace(/\s+/g, '')}.com
                   </span>
                 </div>
@@ -744,10 +759,10 @@ export default function BrandKitPage() {
 
               {/* Navbar — variant-styled */}
               <div className="flex items-center justify-between px-4 py-2.5"
-                style={{ borderBottom: `1px solid ${textColor}10` }}>
+                style={{ borderBottom: bgLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)' }}>
                 <span className="font-bold text-xs truncate max-w-[200px]"
                   style={{
-                    ...HS, color: textColor,
+                    ...HS, color: onBg,
                     textTransform: variant === 'bold' ? 'uppercase' : 'none',
                     letterSpacing: variant === 'bold' ? '0.06em' : 'normal',
                     fontWeight: variant === 'bold' ? 900 : 600,
@@ -757,7 +772,7 @@ export default function BrandKitPage() {
                 <div className="flex gap-3">
                   {(variant === 'editorial' ? ['Work', 'About', 'Reserve'] : ['Product', 'Pricing', 'About'])
                     .map(l => (
-                      <span key={l} className="text-[10px] opacity-35" style={{ color: textColor }}>{l}</span>
+                      <span key={l} className="text-[10px] opacity-35" style={{ color: onBg }}>{l}</span>
                     ))}
                 </div>
               </div>
@@ -768,12 +783,12 @@ export default function BrandKitPage() {
                   <div className="w-2 shrink-0" style={{ backgroundColor: accent }} />
                   <div className="flex-1 px-5 py-6 flex flex-col justify-between">
                     <p className="font-black leading-tight break-words uppercase"
-                      style={{ ...HS, fontSize: 17, color: textColor, letterSpacing: '-0.01em' }}>
+                      style={{ ...HS, fontSize: 17, color: onBg, letterSpacing: '-0.01em' }}>
                       {kit?.tagline_options?.[0] ?? asset.brandName}
                     </p>
                     <div className="mt-4">
-                      <span className="inline-block px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white"
-                        style={{ backgroundColor: primary, borderRadius: '3px' }}>
+                      <span className="inline-block px-4 py-2 text-[10px] font-black uppercase tracking-wider transition hover:brightness-[0.92]"
+                        style={{ backgroundColor: primary, color: onPrimary, borderRadius: '3px' }}>
                         Get Started
                       </span>
                     </div>
@@ -785,13 +800,16 @@ export default function BrandKitPage() {
                 <div className="px-5 py-6">
                   <div className="h-px w-6 mb-4" style={{ backgroundColor: primary }} />
                   <p className="leading-snug mb-2 break-words"
-                    style={{ ...HS, fontSize: 14, fontWeight: 300, color: textColor, letterSpacing: '0.01em' }}>
+                    style={{ ...HS, fontSize: 14, fontWeight: 300, color: onBg, letterSpacing: '0.01em' }}>
                     {kit?.tagline_options?.[0] ?? asset.brandName}
                   </p>
-                  <p className="text-[8px] mb-4 opacity-38 leading-relaxed" style={{ ...BS, color: textColor }}>
+                  <p className="text-[8px] mb-4 opacity-38 leading-relaxed" style={{ ...BS, color: onBg }}>
                     Crafted with intention. Built to endure.
                   </p>
-                  <span className="text-[9px] font-medium" style={{ color: primary, ...BS }}>
+                  <span className="text-[9px] font-medium" style={{
+                    color: getContrastRatio(bgColor, primary) >= 3 ? primary : onBg,
+                    ...BS,
+                  }}>
                     Explore →
                   </span>
                 </div>
@@ -800,14 +818,14 @@ export default function BrandKitPage() {
               {variant === 'minimal' && (
                 <div className="px-5 py-6 text-center">
                   <p className="font-bold leading-tight mb-2 break-words"
-                    style={{ ...HS, fontSize: 14, color: textColor, letterSpacing: '-0.02em' }}>
+                    style={{ ...HS, fontSize: 14, color: onBg, letterSpacing: '-0.02em' }}>
                     {kit?.tagline_options?.[0] ?? asset.brandName}
                   </p>
-                  <p className="text-[8px] mb-4 opacity-38 leading-relaxed" style={{ ...BS, color: textColor }}>
+                  <p className="text-[8px] mb-4 opacity-38 leading-relaxed" style={{ ...BS, color: onBg }}>
                     Built for teams moving fast.
                   </p>
-                  <span className="inline-block px-4 py-1.5 text-[9px] font-semibold text-white"
-                    style={{ backgroundColor: primary, borderRadius: '999px' }}>
+                  <span className="inline-block px-4 py-1.5 text-[9px] font-semibold transition hover:brightness-[0.92]"
+                    style={{ backgroundColor: primary, color: onPrimary, borderRadius: '999px' }}>
                     Get Started
                   </span>
                 </div>
@@ -816,14 +834,14 @@ export default function BrandKitPage() {
               {variant === 'friendly' && (
                 <div className="px-5 py-6">
                   <p className="font-bold leading-tight mb-2 break-words"
-                    style={{ ...HS, fontSize: 14, color: textColor, letterSpacing: '-0.01em', fontWeight: 800 }}>
+                    style={{ ...HS, fontSize: 14, color: onBg, letterSpacing: '-0.01em', fontWeight: 800 }}>
                     {kit?.tagline_options?.[0] ?? asset.brandName}
                   </p>
-                  <p className="text-[8px] mb-4 opacity-38 leading-relaxed" style={{ ...BS, color: textColor }}>
+                  <p className="text-[8px] mb-4 opacity-38 leading-relaxed" style={{ ...BS, color: onBg }}>
                     Something warm and genuinely helpful.
                   </p>
-                  <span className="inline-block px-4 py-1.5 text-[9px] font-bold text-white"
-                    style={{ backgroundColor: primary, borderRadius: '12px' }}>
+                  <span className="inline-block px-4 py-1.5 text-[9px] font-bold transition hover:brightness-[0.92]"
+                    style={{ backgroundColor: primary, color: onPrimary, borderRadius: '12px' }}>
                     Get Started
                   </span>
                 </div>
@@ -837,10 +855,11 @@ export default function BrandKitPage() {
           <div style={{ borderRadius: V.cardRadius, border: `1px solid ${V.cardBorder}`, backgroundColor: V.cardBg, overflow: 'hidden' }}>
             <div className="flex flex-col items-center p-8" style={{ minHeight: 300, backgroundColor: V.cardBg }}>
               {/* Avatar */}
-              <div className="flex items-center justify-center font-bold text-white mb-4 select-none"
+              <div className="flex items-center justify-center font-bold mb-4 select-none"
                 style={{
                   width: 96, height: 96,
                   backgroundColor: primary,
+                  color: onPrimary,
                   fontSize: 42,
                   fontWeight: variant === 'bold' ? 900 : 700,
                   borderRadius: shapeRadius(monoShape, 96),
@@ -850,24 +869,24 @@ export default function BrandKitPage() {
                 }}>
                 {monoLetter}
               </div>
-              <p className="font-bold text-base text-white mb-1 text-center truncate max-w-[220px]"
-                style={{ ...HS, textTransform: variant === 'bold' ? 'uppercase' : 'none', letterSpacing: variant === 'bold' ? '0.05em' : 'normal' }}>
+              <p className="font-bold text-base mb-1 text-center truncate max-w-[220px]"
+                style={{ ...HS, color: onPanel, textTransform: variant === 'bold' ? 'uppercase' : 'none', letterSpacing: variant === 'bold' ? '0.05em' : 'normal' }}>
                 {asset.brandName}
               </p>
               {kit?.tagline_options?.[0] && (
-                <p className="text-xs text-zinc-500 text-center mb-5 line-clamp-2 max-w-[220px]" style={BS}>
+                <p className="text-xs text-center mb-5 line-clamp-2 max-w-[220px]" style={{ ...BS, color: onPanel, opacity: 0.78 }}>
                   {kit.tagline_options[0]}
                 </p>
               )}
-              <button type="button" className="px-6 py-2 text-xs font-bold text-white"
-                style={{ backgroundColor: primary, borderRadius: V.ctaRadius }}>
+              <button type="button" className="px-6 py-2 text-xs font-bold transition hover:brightness-[0.92]"
+                style={{ backgroundColor: primary, color: onPrimary, borderRadius: V.ctaRadius }}>
                 Follow
               </button>
               <div className="flex gap-8 mt-6 pt-5 w-full justify-center"
                 style={{ borderTop: `1px solid ${V.cardBorder}` }}>
                 {[['2.4k', 'Posts'], ['18k', 'Followers'], ['340', 'Following']].map(([n, l]) => (
                   <div key={l} className="text-center">
-                    <p className="text-sm font-bold text-white">{n}</p>
+                    <p className="text-sm font-bold" style={{ color: onPanel }}>{n}</p>
                     <p className="text-[10px] text-zinc-600">{l}</p>
                   </div>
                 ))}
@@ -892,10 +911,11 @@ export default function BrandKitPage() {
                     {variant === 'editorial' && (
                       <div className="w-1 self-stretch" style={{ backgroundColor: primary }} />
                     )}
-                    <div className="flex-shrink-0 flex items-center justify-center font-bold text-white select-none"
+                    <div className="flex-shrink-0 flex items-center justify-center font-bold select-none"
                       style={{
                         width: 32, height: 32,
                         backgroundColor: primary,
+                        color: onPrimary,
                         fontSize: 13,
                         fontWeight: 700,
                         borderRadius: shapeRadius(monoShape, 32),
@@ -906,7 +926,7 @@ export default function BrandKitPage() {
                     </div>
                     <span className="font-bold text-xs truncate max-w-[160px]"
                       style={{
-                        ...HS, color: textColor,
+                        ...HS, color: onBg,
                         textTransform: variant === 'bold' ? 'uppercase' : 'none',
                         letterSpacing: variant === 'bold' ? '0.06em' : 'normal',
                         fontWeight: variant === 'bold' ? 900 : 600,
@@ -916,13 +936,13 @@ export default function BrandKitPage() {
                   </div>
                   {/* Contact info */}
                   <div>
-                    <p className="font-semibold text-[11px] mb-0.5" style={{ ...HS, color: textColor }}>
+                    <p className="font-semibold text-[11px] mb-0.5" style={{ ...HS, color: onBg }}>
                       Alex Johnson
                     </p>
-                    <p className="text-[9px] mb-2 opacity-42" style={{ ...BS, color: textColor }}>
+                    <p className="text-[9px] mb-2 opacity-42" style={{ ...BS, color: onBg }}>
                       {variant === 'editorial' ? 'Creative Director' : variant === 'bold' ? 'Head Coach' : 'Founder & CEO'}
                     </p>
-                    <p className="text-[8px] opacity-32" style={{ ...BS, color: textColor }}>
+                    <p className="text-[8px] opacity-32" style={{ ...BS, color: onBg }}>
                       hello@{asset.brandName.toLowerCase().replace(/\s+/g, '')}.com
                     </p>
                   </div>
@@ -959,7 +979,7 @@ export default function BrandKitPage() {
                         borderRadius: variant === 'bold' ? '5px' : variant === 'friendly' ? '12px' : '8px',
                       }} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-white capitalize truncate">{role}</p>
+                      <p className="text-xs font-semibold capitalize truncate" style={{ color: onPanel }}>{role}</p>
                       <p className="text-[10px] text-gray-600 truncate">{color.name}</p>
                     </div>
                     <CopyButton text={color.hex} label={color.hex} />
@@ -976,13 +996,13 @@ export default function BrandKitPage() {
               <div className="space-y-5">
                 <div>
                   <p className="text-[9px] text-gray-600 uppercase tracking-wider mb-2">Heading</p>
-                  <p className="text-5xl leading-none text-white" style={{ ...HS, fontWeight: V.nameWeight }}>Aa</p>
+                  <p className="text-5xl leading-none" style={{ ...HS, fontWeight: V.nameWeight, color: onPanel }}>Aa</p>
                   <p className="text-xs text-gray-400 mt-2 break-words" style={HS}>{heading ?? 'System UI'}</p>
                   <p className="text-[10px] text-gray-700 mt-1" style={HS}>ABCDEFG abcdefg 01234</p>
                 </div>
                 <div style={{ borderTop: `1px solid ${V.cardBorder}`, paddingTop: '20px' }}>
                   <p className="text-[9px] text-gray-600 uppercase tracking-wider mb-2">Body</p>
-                  <p className="text-4xl leading-none text-white" style={BS}>Aa</p>
+                  <p className="text-4xl leading-none" style={{ ...BS, color: onPanel }}>Aa</p>
                   <p className="text-xs text-gray-400 mt-2 break-words" style={BS}>{body ?? 'System UI'}</p>
                   <p className="text-[10px] text-gray-700 mt-1 leading-relaxed" style={BS}>The quick brown fox</p>
                 </div>
@@ -1006,7 +1026,7 @@ export default function BrandKitPage() {
                       backgroundColor: 'transparent',
                       transition: 'border-color 0.15s',
                     }}>
-                    <p className="text-sm text-white leading-snug" style={HS}>{t}</p>
+                    <p className="text-sm leading-snug" style={{ ...HS, color: onPanel }}>{t}</p>
                     <p className="text-[9px] text-gray-700 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                       Click to copy
                     </p>
@@ -1059,7 +1079,7 @@ export default function BrandKitPage() {
                             <span key={t} className="px-3 py-1 text-xs font-medium"
                               style={{
                                 backgroundColor: `${primary}14`,
-                                color: primary,
+                                color: getBrandColorOnPanel(primary, V.cardBg),
                                 border: `1px solid ${primary}32`,
                                 borderRadius: V.personalityRadius,
                               }}>
@@ -1081,7 +1101,7 @@ export default function BrandKitPage() {
                     {kit.brand_voice.tone && (
                       <div>
                         <p className="text-[10px] text-gray-600 font-bold uppercase mb-1">Tone</p>
-                        <p className="text-white font-medium text-sm">{kit.brand_voice.tone}</p>
+                        <p className="font-medium text-sm" style={{ color: onPanel }}>{kit.brand_voice.tone}</p>
                       </div>
                     )}
                     {kit.brand_voice.personality && (
@@ -1133,8 +1153,8 @@ export default function BrandKitPage() {
                   <div className="grid md:grid-cols-3 gap-4">
                     {kit!.logo_concepts.map((concept, i) => (
                       <div key={i} style={{ backgroundColor: V.cardBg, border: `1px solid ${V.cardBorder}`, borderRadius: V.cardRadius, padding: '20px' }}>
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold mb-3"
-                          style={{ backgroundColor: primary }}>{i + 1}</div>
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold mb-3"
+                          style={{ backgroundColor: primary, color: onPrimary }}>{i + 1}</div>
                         <p className="text-sm text-gray-400 leading-relaxed">{concept}</p>
                       </div>
                     ))}
@@ -1152,8 +1172,8 @@ export default function BrandKitPage() {
         style={{ borderTop: `1px solid rgba(255,255,255,0.04)` }}>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/"
-            className="px-8 py-3 text-sm font-bold text-white transition-opacity hover:opacity-80"
-            style={{ backgroundColor: primary, borderRadius: V.ctaRadius }}>
+            className="px-8 py-3 text-sm font-bold transition duration-150 hover:brightness-[0.92] active:brightness-[0.85]"
+            style={{ backgroundColor: primary, color: onPrimary, borderRadius: V.ctaRadius }}>
             Generate Another Brand Kit
           </Link>
           <p className="text-[11px] text-gray-700">

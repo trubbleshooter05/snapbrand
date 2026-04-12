@@ -60,7 +60,7 @@ export function VerticalGenerateForm({ businessType, examplePrompt }: Props) {
     'w-full px-4 py-3 rounded-xl border border-white/20 bg-zinc-950 text-zinc-100 placeholder:text-zinc-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400/50 disabled:opacity-50 disabled:cursor-not-allowed'
 
   return (
-    <div className="rounded-2xl border border-white/15 bg-zinc-950/70 shadow-2xl shadow-black/50 p-6 md:p-8 text-left ring-1 ring-white/5">
+    <div className="relative z-10 isolate rounded-2xl border border-white/15 bg-zinc-950/70 shadow-2xl shadow-black/50 p-6 md:p-8 text-left ring-1 ring-white/5">
       <form onSubmit={handleGenerate} className="space-y-5">
         {formError && (
           <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl text-sm">

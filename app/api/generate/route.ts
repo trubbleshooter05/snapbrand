@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 import { APIError, OpenAI } from 'openai'
 import { buildContrastSummary, dedupePaletteColors, normalizeHex } from '@/lib/color-utils'
+import { normalizeAndEnforcePalette } from '@/lib/colorUtils'
 import { fontPairingsPromptBlock, resolveFontPairing } from '@/lib/font-pairings'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -239,6 +240,7 @@ export async function POST(request: NextRequest) {
           if (n) entry.hex = n
         }
       }
+      normalizeAndEnforcePalette(cp)
       dedupePaletteColors(kit as Parameters<typeof dedupePaletteColors>[0])
       dedupePaletteColors(kit as Parameters<typeof dedupePaletteColors>[0])
       try {

@@ -14,23 +14,19 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
 }
 
-/** Relative luminance 0–1 (sRGB). */
+import { getContrastRatio as wcagContrastRatio, getLuminance } from "./colorUtils";
+
+/** Relative luminance 0–1 (sRGB) — alias for {@link getLuminance}. */
 export function relativeLuminance(hex: string): number {
-  const rgb = hexToRgb(hex);
-  if (!rgb) return 0;
-  const lin = [rgb.r, rgb.g, rgb.b].map((c) => {
-    const x = c / 255;
-    return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
-  });
-  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+  const n = normalizeHex(hex);
+  return n ? getLuminance(n) : 0;
 }
 
 export function contrastRatio(hex1: string, hex2: string): number {
-  const L1 = relativeLuminance(hex1);
-  const L2 = relativeLuminance(hex2);
-  const light = Math.max(L1, L2);
-  const dark = Math.min(L1, L2);
-  return (light + 0.05) / (dark + 0.05);
+  const a = normalizeHex(hex1);
+  const b = normalizeHex(hex2);
+  if (!a || !b) return 1;
+  return wcagContrastRatio(a, b);
 }
 
 export function formatContrastLabel(ratio: number): string {
