@@ -71,7 +71,22 @@ export default function BrandKitPage() {
   const heading = kit?.typography?.heading_font
   const body    = kit?.typography?.body_font
   const primary = kit?.color_palette?.primary?.hex ?? '#4F46E5'
+  const accent = kit?.color_palette?.accent?.hex ?? '#6366F1'
+  const bgColor = kit?.color_palette?.background?.hex ?? '#F8FAFC'
+  const textColor = kit?.color_palette?.text?.hex ?? '#0F172A'
   const colors  = kit?.color_palette ? Object.entries(kit.color_palette) : []
+  
+  const personality = kit?.brand_strategy?.brand_personality?.[0]?.toLowerCase() ?? ''
+  const isElegant = personality.includes('elegant') || personality.includes('luxury') || personality.includes('premium')
+  const isTech = personality.includes('modern') || personality.includes('tech') || personality.includes('innovative')
+  const isFriendly = personality.includes('friendly') || personality.includes('warm') || personality.includes('approachable')
+  
+  const lockupAlignment = isElegant ? 'left' : isTech ? 'center' : 'left'
+  const lockupSpacing = isElegant ? 'relaxed' : isTech ? 'tight' : 'normal'
+  
+  const monogram = kit?.logo_monogram
+  const monogramLetter = monogram?.letter ?? asset.brandName.charAt(0).toUpperCase()
+  const monogramShape = monogram?.shape ?? (isFriendly ? 'circle' : isTech ? 'hexagon' : 'rounded-square')
 
   const googleFontsUrl = [heading, body].filter(Boolean).length
     ? `https://fonts.googleapis.com/css2?${[
@@ -110,84 +125,239 @@ export default function BrandKitPage() {
           )}
         </div>
 
-        {/* ── Logo concepts (GPT SVG) or legacy monogram ───────────────────── */}
-        {kit?.logo_svg_concepts && kit.logo_svg_concepts.length > 0 ? (
-          <section>
-            <SectionLabel>Logo Concepts</SectionLabel>
-            <p className="text-sm text-gray-500 mb-6">
-              Four distinct directions — real SVG you can refine or hand to a designer.
-            </p>
-            <div className="space-y-10">
-              {kit.logo_svg_concepts.map((concept) => {
-                const usageMap: Record<string, string> = {
-                  wordmark: "Website header, email signature, documents",
-                  icon_lockup: "Social profile, business card, app icon + name",
-                  lettermark: "Favicon, app icon, profile picture, small spaces",
-                  abstract: "Brand mark, packaging seal, watermark",
+        {/* ── Brand Lockup System ──────────────────────────────────────────── */}
+        <section>
+          <SectionLabel>Brand Lockup</SectionLabel>
+          
+          {/* Hero Preview Block */}
+          <div 
+            className="rounded-2xl overflow-hidden mb-8"
+            style={{ backgroundColor: primary }}
+          >
+            <div className="px-12 py-16 md:px-20 md:py-24 text-center">
+              <h2 
+                className="text-4xl md:text-6xl font-bold mb-4 text-white"
+                style={{ 
+                  fontFamily: heading ? `'${heading}', sans-serif` : undefined,
+                  letterSpacing: lockupSpacing === 'tight' ? '-0.02em' : lockupSpacing === 'relaxed' ? '0.02em' : '0'
+                }}
+              >
+                {asset.brandName}
+              </h2>
+              {kit?.tagline_options?.[0] && (
+                <p 
+                  className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto"
+                  style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}
+                >
+                  {kit.tagline_options[0]}
+                </p>
+              )}
+              <button
+                type="button"
+                className="px-8 py-3 rounded-lg text-base font-semibold shadow-lg hover:shadow-xl transition-shadow"
+                style={{ 
+                  backgroundColor: accent,
+                  color: '#FFFFFF'
+                }}
+              >
+                Get Started
+              </button>
+            </div>
+          </div>
+
+          {/* Primary Lockup - Light & Dark */}
+          <div className="space-y-8 mb-8">
+            <div>
+              <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider">Primary lockup · Light background</p>
+              <div 
+                className="rounded-2xl p-12 md:p-16"
+                style={{ backgroundColor: bgColor }}
+              >
+                <div style={{ textAlign: lockupAlignment }}>
+                  <h3 
+                    className="font-bold mb-2"
+                    style={{ 
+                      fontSize: 'clamp(2rem, 5vw, 4rem)',
+                      fontFamily: heading ? `'${heading}', sans-serif` : undefined,
+                      color: textColor,
+                      letterSpacing: lockupSpacing === 'tight' ? '-0.02em' : lockupSpacing === 'relaxed' ? '0.02em' : '0'
+                    }}
+                  >
+                    {asset.brandName}
+                  </h3>
+                  {kit?.tagline_options?.[0] && (
+                    <p 
+                      className="text-lg opacity-70"
+                      style={{ 
+                        fontFamily: body ? `'${body}', sans-serif` : undefined,
+                        color: textColor
+                      }}
+                    >
+                      {kit.tagline_options[0]}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider">Primary lockup · Dark background</p>
+              <div 
+                className="rounded-2xl p-12 md:p-16"
+                style={{ backgroundColor: textColor }}
+              >
+                <div style={{ textAlign: lockupAlignment }}>
+                  <h3 
+                    className="font-bold mb-2"
+                    style={{ 
+                      fontSize: 'clamp(2rem, 5vw, 4rem)',
+                      fontFamily: heading ? `'${heading}', sans-serif` : undefined,
+                      color: bgColor,
+                      letterSpacing: lockupSpacing === 'tight' ? '-0.02em' : lockupSpacing === 'relaxed' ? '0.02em' : '0'
+                    }}
+                  >
+                    {asset.brandName}
+                  </h3>
+                  {kit?.tagline_options?.[0] && (
+                    <p 
+                      className="text-lg opacity-70"
+                      style={{ 
+                        fontFamily: body ? `'${body}', sans-serif` : undefined,
+                        color: bgColor
+                      }}
+                    >
+                      {kit.tagline_options[0]}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Monogram Marks */}
+          <div className="mb-8">
+            <p className="text-xs text-gray-500 mb-4 uppercase tracking-wider">Monogram · Multiple sizes</p>
+            <div className="flex flex-wrap items-end gap-6">
+              {[
+                { size: 120, label: 'Social (120px)' },
+                { size: 64, label: 'Favicon (64px)' },
+                { size: 32, label: 'App icon (32px)' }
+              ].map(({ size, label }) => {
+                const shapeStyles = {
+                  circle: { borderRadius: '50%' },
+                  'rounded-square': { borderRadius: `${size * 0.2}px` },
+                  hexagon: { 
+                    clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                  },
+                  diamond: {
+                    clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+                  }
                 };
                 return (
-                  <div
-                    key={concept.id}
-                    className="rounded-2xl border border-white/10 bg-slate-900/40 p-6 space-y-4"
-                  >
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="text-lg font-semibold text-white">{concept.label}</p>
-                      <span className="text-xs uppercase tracking-wider text-gray-500">
-                        {concept.id.replace(/_/g, ' ')}
-                      </span>
+                  <div key={size} className="text-center">
+                    <div
+                      className="inline-flex items-center justify-center font-bold text-white mb-2"
+                      style={{
+                        width: size,
+                        height: size,
+                        backgroundColor: primary,
+                        fontSize: size * 0.5,
+                        fontFamily: heading ? `'${heading}', sans-serif` : undefined,
+                        ...shapeStyles[monogramShape as keyof typeof shapeStyles]
+                      }}
+                    >
+                      {monogramLetter}
                     </div>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-2">Light background</p>
-                        <div className="w-full min-h-[120px] rounded-xl bg-white flex items-center justify-center p-6 overflow-hidden">
-                          <div className="w-full max-w-2xl [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-h-[120px]" dangerouslySetInnerHTML={{ __html: concept.svg }} />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-2">Dark background</p>
-                        <div className="w-full min-h-[120px] rounded-xl bg-gray-900 border border-white/10 flex items-center justify-center p-6 overflow-hidden">
-                          <div className="w-full max-w-2xl [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-h-[120px]" dangerouslySetInnerHTML={{ __html: concept.svg }} />
-                        </div>
-                      </div>
-                      {usageMap[concept.id] && (
-                        <p className="text-xs text-gray-400 italic">
-                          Use for: {usageMap[concept.id]}
-                        </p>
-                      )}
-                    </div>
+                    <p className="text-xs text-gray-500">{label}</p>
                   </div>
                 );
               })}
             </div>
-          </section>
-        ) : (asset.logoSvg || asset.wordmarkSvg) ? (
-          <section>
-            <SectionLabel>Logo Mark</SectionLabel>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div className="bg-white rounded-2xl p-12 flex items-center justify-center">
-                {asset.logoSvg && (
-                  <div
-                    className="w-40 h-40"
-                    dangerouslySetInnerHTML={{ __html: asset.logoSvg }}
-                  />
-                )}
+          </div>
+
+          {/* Color Application Strip */}
+          <div>
+            <p className="text-xs text-gray-500 mb-4 uppercase tracking-wider">Real-world application</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Business Card */}
+              <div className="rounded-xl border border-white/10 overflow-hidden">
+                <div 
+                  className="aspect-[1.75/1] p-4 flex flex-col justify-between text-xs"
+                  style={{ backgroundColor: bgColor, color: textColor }}
+                >
+                  <div style={{ fontFamily: heading ? `'${heading}', sans-serif` : undefined }} className="font-bold text-sm">
+                    {asset.brandName}
+                  </div>
+                  <div style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }} className="space-y-0.5 opacity-70">
+                    <p>John Doe</p>
+                    <p>Founder</p>
+                    <p>hello@example.com</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 px-3 py-2 bg-slate-900/40">Business card</p>
               </div>
-              <div className="bg-gray-900 border border-white/10 rounded-2xl p-12 flex items-center justify-center">
-                {asset.logoSvg && (
+
+              {/* Social Avatar */}
+              <div className="rounded-xl border border-white/10 overflow-hidden">
+                <div className="aspect-square bg-slate-900/40 p-4 flex items-center justify-center">
                   <div
-                    className="w-40 h-40"
-                    dangerouslySetInnerHTML={{ __html: asset.logoSvg }}
-                  />
-                )}
+                    className="w-20 h-20 flex items-center justify-center font-bold text-white text-2xl"
+                    style={{
+                      backgroundColor: primary,
+                      fontFamily: heading ? `'${heading}', sans-serif` : undefined,
+                      borderRadius: monogramShape === 'circle' ? '50%' : '12px'
+                    }}
+                  >
+                    {monogramLetter}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 px-3 py-2 bg-slate-900/40">Social avatar</p>
+              </div>
+
+              {/* Website Header */}
+              <div className="rounded-xl border border-white/10 overflow-hidden">
+                <div 
+                  className="aspect-[2/1] px-4 py-3 flex items-center justify-between text-xs"
+                  style={{ backgroundColor: bgColor, color: textColor }}
+                >
+                  <div style={{ fontFamily: heading ? `'${heading}', sans-serif` : undefined }} className="font-bold text-sm">
+                    {asset.brandName.length > 15 ? asset.brandName.slice(0, 12) + '...' : asset.brandName}
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="w-2 h-2 rounded-full opacity-50" style={{ backgroundColor: textColor }}></div>
+                    <div className="w-2 h-2 rounded-full opacity-50" style={{ backgroundColor: textColor }}></div>
+                    <div className="w-2 h-2 rounded-full opacity-50" style={{ backgroundColor: textColor }}></div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 px-3 py-2 bg-slate-900/40">Website header</p>
+              </div>
+
+              {/* Email Signature */}
+              <div className="rounded-xl border border-white/10 overflow-hidden">
+                <div 
+                  className="aspect-[1.5/1] p-4 flex items-center gap-3 text-xs"
+                  style={{ backgroundColor: bgColor, color: textColor }}
+                >
+                  <div
+                    className="w-10 h-10 flex-shrink-0 flex items-center justify-center font-bold text-white text-sm"
+                    style={{
+                      backgroundColor: primary,
+                      fontFamily: heading ? `'${heading}', sans-serif` : undefined,
+                      borderRadius: monogramShape === 'circle' ? '50%' : '6px'
+                    }}
+                  >
+                    {monogramLetter}
+                  </div>
+                  <div style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }} className="space-y-0.5">
+                    <p className="font-semibold text-xs">{asset.brandName.length > 12 ? asset.brandName.slice(0, 10) + '...' : asset.brandName}</p>
+                    <p className="opacity-60 text-[10px]">John Doe · Founder</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 px-3 py-2 bg-slate-900/40">Email signature</p>
               </div>
             </div>
-            {asset.wordmarkSvg && (
-              <div className="bg-white rounded-2xl p-8 flex items-center justify-center overflow-x-auto">
-                <div dangerouslySetInnerHTML={{ __html: asset.wordmarkSvg }} />
-              </div>
-            )}
-          </section>
-        ) : null}
+          </div>
+        </section>
 
         {/* ── Color palette ─────────────────────────────────────────────────── */}
         {colors.length > 0 && (
