@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import type { BrandKitData } from '@/app/api/generate/route'
+import type { LogoSvgConcept } from '@/lib/logo-concepts-openai'
 
 interface Asset {
   id: string
@@ -12,7 +13,7 @@ interface Asset {
   logoSvg: string | null
   wordmarkSvg: string | null
   createdAt: string
-  brandKitData: BrandKitData | null
+  brandKitData: (BrandKitData & { logo_svg_concepts?: LogoSvgConcept[] }) | null
 }
 
 function CopyButton({ text, label }: { text: string; label?: string }) {
@@ -109,12 +110,57 @@ export default function BrandKitPage() {
           )}
         </div>
 
-        {/* ── Logo mark ─────────────────────────────────────────────────────── */}
-        {(asset.logoSvg || asset.wordmarkSvg) && (
+        {/* ── Logo concepts (GPT SVG) or legacy monogram ───────────────────── */}
+        {kit?.logo_svg_concepts && kit.logo_svg_concepts.length > 0 ? (
+          <section>
+            <SectionLabel>Logo Concepts</SectionLabel>
+            <p className="text-sm text-gray-500 mb-6">
+              Four distinct directions — real SVG you can refine or hand to a designer.
+            </p>
+            <div className="space-y-10">
+              {kit.logo_svg_concepts.map((concept) => (
+                <div
+                  key={concept.id}
+                  className="rounded-2xl border border-white/10 bg-slate-900/40 p-6 space-y-4"
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="text-lg font-semibold text-white">{concept.label}</p>
+                    <span className="text-xs uppercase tracking-wider text-gray-500">
+                      {concept.id.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-2">Icon · 48×48</p>
+                      <div className="flex gap-4 flex-wrap">
+                        <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center overflow-hidden [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:object-contain">
+                          <div dangerouslySetInnerHTML={{ __html: concept.svg }} />
+                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-gray-900 border border-white/10 flex items-center justify-center overflow-hidden [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:object-contain">
+                          <div dangerouslySetInnerHTML={{ __html: concept.svg }} />
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-2">Lockup · 200px wide</p>
+                      <div className="flex flex-col gap-3">
+                        <div className="w-[200px] min-h-[60px] rounded-xl bg-white flex items-center justify-center px-2 py-2 overflow-hidden [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-h-[60px]">
+                          <div className="w-full flex items-center justify-center" dangerouslySetInnerHTML={{ __html: concept.svg }} />
+                        </div>
+                        <div className="w-[200px] min-h-[60px] rounded-xl bg-gray-900 border border-white/10 flex items-center justify-center px-2 py-2 overflow-hidden [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-h-[60px]">
+                          <div className="w-full flex items-center justify-center" dangerouslySetInnerHTML={{ __html: concept.svg }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : (asset.logoSvg || asset.wordmarkSvg) ? (
           <section>
             <SectionLabel>Logo Mark</SectionLabel>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              {/* Light background */}
               <div className="bg-white rounded-2xl p-12 flex items-center justify-center">
                 {asset.logoSvg && (
                   <div
@@ -123,7 +169,6 @@ export default function BrandKitPage() {
                   />
                 )}
               </div>
-              {/* Dark background */}
               <div className="bg-gray-900 border border-white/10 rounded-2xl p-12 flex items-center justify-center">
                 {asset.logoSvg && (
                   <div
@@ -133,14 +178,13 @@ export default function BrandKitPage() {
                 )}
               </div>
             </div>
-            {/* Wordmark */}
             {asset.wordmarkSvg && (
               <div className="bg-white rounded-2xl p-8 flex items-center justify-center overflow-x-auto">
                 <div dangerouslySetInnerHTML={{ __html: asset.wordmarkSvg }} />
               </div>
             )}
           </section>
-        )}
+        ) : null}
 
         {/* ── Color palette ─────────────────────────────────────────────────── */}
         {colors.length > 0 && (
@@ -452,8 +496,8 @@ export default function BrandKitPage() {
           </section>
         )}
 
-        {/* ── Logo concepts ─────────────────────────────────────────────────── */}
-        {kit?.logo_concepts && kit.logo_concepts.length > 0 && (
+        {/* ── Logo concept notes (text-only fallback when no SVG concepts) ─── */}
+        {!kit?.logo_svg_concepts?.length && kit?.logo_concepts && kit.logo_concepts.length > 0 && (
           <section>
             <SectionLabel>Logo Concept Directions</SectionLabel>
             <p className="text-sm text-gray-500 mb-4">Hand these to a designer for custom execution:</p>

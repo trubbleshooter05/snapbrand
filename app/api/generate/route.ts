@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 import { APIError, OpenAI } from 'openai'
 import { generateLogoSVG, generateWordmarkSVG } from '@/lib/generate-logo-svg'
+import { generateLogoSvgConcepts, type LogoSvgConcept } from '@/lib/logo-concepts-openai'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
@@ -85,6 +86,8 @@ export interface BrandKitData {
     shape:  'circle' | 'rounded-square' | 'hexagon' | 'diamond'
     style:  string
   }
+  /** GPT-generated distinct SVG concepts (wordmark, lockup, lettermark, abstract). */
+  logo_svg_concepts?: LogoSvgConcept[]
 }
 
 const SYSTEM_PROMPT = `You are an expert brand strategist and creative director.
@@ -246,24 +249,56 @@ export async function POST(request: NextRequest) {
     const monogram = kit.logo_monogram ?? ({} as BrandKitData['logo_monogram'])
     const primaryHex   = kit.color_palette?.primary?.hex   ?? '#4F46E5'
     const secondaryHex = kit.color_palette?.secondary?.hex ?? '#7C3AED'
+    const accentHex    = kit.color_palette?.accent?.hex     ?? '#6366F1'
+    const bgHex        = kit.color_palette?.background?.hex  ?? '#F8FAFC'
+    const textHex      = kit.color_palette?.text?.hex       ?? '#0F172A'
     const headingFont  = kit.typography?.heading_font      ?? 'Inter'
 
-    const logoSvg = generateLogoSVG({
-      letter:          monogram.letter ?? brandName.charAt(0),
-      primaryColor:    primaryHex,
-      secondaryColor:  secondaryHex,
-      backgroundColor: '#FFFFFF',
-      shape:           (['circle', 'rounded-square', 'hexagon', 'diamond'].includes(String(monogram.shape))
-        ? monogram.shape
-        : 'rounded-square') as 'circle' | 'rounded-square' | 'hexagon' | 'diamond',
-      fontFamily:      headingFont,
-    })
+    let logoSvg: string | null = null
+    let wordmarkSvg: string | null = null
 
-    const wordmarkSvg = generateWordmarkSVG({
-      brandName,
-      primaryColor: primaryHex,
-      fontFamily:   headingFont,
-    })
+    try {
+      const concepts = await generateLogoSvgConcepts({
+        brandName,
+        brandDescription,
+        palette: {
+          primary: primaryHex,
+          secondary: secondaryHex,
+          accent: accentHex,
+          background: bgHex,
+          text: textHex,
+        },
+      })
+      if (concepts.length > 0) {
+        kit.logo_svg_concepts = concepts
+        const wordmark = concepts.find((c) => c.id === 'wordmark')
+        const lockup = concepts.find((c) => c.id === 'icon_lockup')
+        logoSvg = wordmark?.svg ?? lockup?.svg ?? concepts[0]?.svg ?? null
+        wordmarkSvg = wordmark?.svg ?? concepts[0]?.svg ?? null
+      }
+    } catch (e) {
+      console.error('[api/generate] logo concepts failed', e)
+    }
+
+    if (!logoSvg) {
+      logoSvg = generateLogoSVG({
+        letter:          monogram.letter ?? brandName.charAt(0),
+        primaryColor:    primaryHex,
+        secondaryColor:  secondaryHex,
+        backgroundColor: '#FFFFFF',
+        shape:           (['circle', 'rounded-square', 'hexagon', 'diamond'].includes(String(monogram.shape))
+          ? monogram.shape
+          : 'rounded-square') as 'circle' | 'rounded-square' | 'hexagon' | 'diamond',
+        fontFamily:      headingFont,
+      })
+    }
+    if (!wordmarkSvg) {
+      wordmarkSvg = generateWordmarkSVG({
+        brandName,
+        primaryColor: primaryHex,
+        fontFamily:   headingFont,
+      })
+    }
 
     const asset = await prisma.generatedAsset.create({
       data: {
