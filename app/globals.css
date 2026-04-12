@@ -13,14 +13,10 @@ body {
   font-family: var(--font-geist-sans), sans-serif;
 }
 
-/* Form controls default to dark text so light inputs (dashboard, auth) stay readable.
-   Body uses near-white --foreground; without this, typed text is invisible on white fields. */
+/* Do not set a global input `color` — it breaks dark-surface fields (Tailwind utilities
+   and autofill lose). Light-surface inputs should use explicit `text-gray-900` (see
+   dashboard, homepage, vertical forms). */
 @layer base {
-  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
-  textarea,
-  select {
-    color: #111827;
-  }
   input::placeholder,
   textarea::placeholder {
     color: #6b7280;

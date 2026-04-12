@@ -56,11 +56,12 @@ export function VerticalGenerateForm({ businessType, examplePrompt }: Props) {
     }
   }
 
+  /* Light fields on dark page — same pattern as homepage / dashboard (max contrast). */
   const fieldClass =
-    'w-full px-4 py-3 rounded-xl border border-white/20 bg-zinc-950 text-zinc-100 placeholder:text-zinc-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400/50 disabled:opacity-50 disabled:cursor-not-allowed'
+    'w-full px-4 py-3 rounded-xl border border-zinc-600/40 bg-white text-gray-900 placeholder:text-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed'
 
   return (
-    <div className="relative z-10 isolate rounded-2xl border border-white/15 bg-zinc-950/70 shadow-2xl shadow-black/50 p-6 md:p-8 text-left ring-1 ring-white/5">
+    <div className="relative z-10 isolate rounded-2xl border border-white/15 bg-zinc-900/90 shadow-2xl shadow-black/50 p-6 md:p-8 text-left ring-1 ring-white/10">
       <form onSubmit={handleGenerate} className="space-y-5">
         {formError && (
           <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl text-sm">
@@ -74,7 +75,7 @@ export function VerticalGenerateForm({ businessType, examplePrompt }: Props) {
         )}
 
         <div>
-          <label htmlFor="brand-name" className="block text-sm font-medium text-zinc-200 mb-2">
+          <label htmlFor="brand-name" className="block text-sm font-medium text-zinc-100 mb-2">
             Brand name
           </label>
           <input
@@ -92,10 +93,10 @@ export function VerticalGenerateForm({ businessType, examplePrompt }: Props) {
 
         <div>
           <div className="flex items-baseline justify-between gap-2 mb-2">
-            <label htmlFor="business-type" className="block text-sm font-medium text-zinc-200">
+            <label htmlFor="business-type" className="block text-sm font-medium text-zinc-100">
               Business type
             </label>
-            <span className="text-[11px] text-zinc-500 shrink-0">Set for this page</span>
+            <span className="text-[11px] text-zinc-400 shrink-0">Set for this page</span>
           </div>
           <input
             id="business-type"
@@ -104,12 +105,12 @@ export function VerticalGenerateForm({ businessType, examplePrompt }: Props) {
             readOnly
             aria-readonly="true"
             title="Business type for this industry page"
-            className={`${fieldClass} ring-1 ring-indigo-500/25 cursor-default text-zinc-100`}
+            className={`${fieldClass} cursor-default bg-zinc-100 text-gray-900 ring-1 ring-indigo-400/40`}
           />
         </div>
 
         <div>
-          <label htmlFor="brand-description" className="block text-sm font-medium text-zinc-200 mb-2">
+          <label htmlFor="brand-description" className="block text-sm font-medium text-zinc-100 mb-2">
             Describe your brand
           </label>
           <textarea
@@ -137,7 +138,7 @@ export function VerticalGenerateForm({ businessType, examplePrompt }: Props) {
         </button>
       </form>
 
-      <p className="text-center text-sm text-zinc-500 mt-5">
+      <p className="text-center text-sm text-zinc-400 mt-5">
         No signup required · 3 free generations · Takes ~15 seconds
       </p>
 
