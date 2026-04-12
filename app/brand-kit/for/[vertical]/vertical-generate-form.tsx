@@ -56,9 +56,12 @@ export function VerticalGenerateForm({ businessType, examplePrompt }: Props) {
     }
   }
 
+  const fieldClass =
+    'w-full px-4 py-3 rounded-xl border border-white/20 bg-zinc-950 text-zinc-100 placeholder:text-zinc-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400/50 disabled:opacity-50 disabled:cursor-not-allowed'
+
   return (
-    <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-8 text-left">
-      <form onSubmit={handleGenerate} className="space-y-4">
+    <div className="rounded-2xl border border-white/15 bg-zinc-950/70 shadow-2xl shadow-black/50 p-6 md:p-8 text-left ring-1 ring-white/5">
+      <form onSubmit={handleGenerate} className="space-y-5">
         {formError && (
           <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl text-sm">
             {formError}
@@ -71,45 +74,60 @@ export function VerticalGenerateForm({ businessType, examplePrompt }: Props) {
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Brand Name</label>
+          <label htmlFor="brand-name" className="block text-sm font-medium text-zinc-200 mb-2">
+            Brand name
+          </label>
           <input
+            id="brand-name"
             type="text"
             value={brandName}
             onChange={(e) => setBrandName(e.target.value)}
             placeholder="e.g. your business name"
             required
             disabled={generating}
-            className="w-full px-4 py-3 border border-white/15 rounded-xl bg-white text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50"
+            autoComplete="organization"
+            className={fieldClass}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Business type</label>
+          <div className="flex items-baseline justify-between gap-2 mb-2">
+            <label htmlFor="business-type" className="block text-sm font-medium text-zinc-200">
+              Business type
+            </label>
+            <span className="text-[11px] text-zinc-500 shrink-0">Set for this page</span>
+          </div>
           <input
+            id="business-type"
             type="text"
             value={businessType}
             readOnly
-            className="w-full px-4 py-3 border border-white/10 rounded-xl bg-white/5 text-gray-200 cursor-default"
+            aria-readonly="true"
+            title="Business type for this industry page"
+            className={`${fieldClass} ring-1 ring-indigo-500/25 cursor-default text-zinc-100`}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Describe your brand</label>
+          <label htmlFor="brand-description" className="block text-sm font-medium text-zinc-200 mb-2">
+            Describe your brand
+          </label>
           <textarea
+            id="brand-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe your business, audience, and style…"
             rows={4}
             required
             disabled={generating}
-            className="w-full px-4 py-3 border border-white/15 rounded-xl bg-white text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 resize-none"
+            className={`${fieldClass} resize-y min-h-[120px] leading-relaxed`}
           />
         </div>
 
         <button
           type="submit"
           disabled={generating}
-          className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-bold text-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-bold text-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-indigo-950/50"
         >
           {generating ? (
             <span className="animate-pulse">✨ Generating your brand kit…</span>
@@ -119,7 +137,7 @@ export function VerticalGenerateForm({ businessType, examplePrompt }: Props) {
         </button>
       </form>
 
-      <p className="text-center text-sm text-gray-500 mt-4">
+      <p className="text-center text-sm text-zinc-500 mt-5">
         No signup required · 3 free generations · Takes ~15 seconds
       </p>
 
