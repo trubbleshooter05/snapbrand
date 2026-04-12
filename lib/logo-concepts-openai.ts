@@ -24,7 +24,9 @@ Rules:
 Visual rules:
 - Use ONLY the hex colors provided in the user message for fills and strokes. No other colors.
 - Keep paths simple: basic shapes (rect, circle, polygon, path with few commands), max ~40 elements total per SVG.
-- Each SVG must use viewBox="0 0 200 60" for lockup-style layouts OR viewBox="0 0 48 48" for icon-first — prefer viewBox="0 0 200 60" for A and B, "0 0 48 48" or "0 0 64 64" for C and D if icon-heavy, but ALL must scale cleanly when displayed at 200px width and 48px height.
+- viewBox sizing: For wordmarks and lockups with text, calculate viewBox width to fit the full brand name without clipping: (character_count × 16 + 40) minimum. For short names (≤8 chars), use at least 200px wide. For long names (20+ chars), use 400–500px wide. Height: 60–80px for text-heavy, 48–64px for icon-heavy. Examples: "Nike" → viewBox="0 0 200 60", "Precision Performance Coaching" → viewBox="0 0 520 70".
+- Always use text-anchor="start" for <text> and position x so the full brand name is visible. Do NOT crop text.
+- Test logic: if the brand name is "Precision Performance Coaching" (32 characters), the viewBox width needs to be at least 520px (32 × 16 + 8).
 - No embedded raster images, no filters, no script, no foreignObject, no animation.
 - Text in SVG: use <text> with font-family sans-serif or system-ui as fallback; keep copy short (brand name).
 
@@ -64,7 +66,9 @@ Description: ${brandDescription}
 
 ${colorBlock}
 
-Generate 4 distinct logo concepts as clean SVG code. Each must be visually different in structure. Use only the brand's color palette. Keep shapes simple and geometric — no complex illustrations. The SVG must render at both 48×48 (icon) and 200×60 (lockup) cleanly when scaled with CSS.`;
+Generate 4 distinct logo concepts as clean SVG code. Each must be visually different in structure. Use only the brand's color palette. Keep shapes simple and geometric — no complex illustrations.
+
+CRITICAL: Set viewBox dimensions that fit the brand name without clipping. Calculate width: (character_count × 16 + 40) pixels minimum. Brand name "${brandName}" has ${brandName.length} characters — viewBox width must be at least ${brandName.length * 16 + 40}px. Use text-anchor="start" and position text so the full name is visible.`;
 
   const res = await openai.chat.completions.create({
     model: "gpt-4o",

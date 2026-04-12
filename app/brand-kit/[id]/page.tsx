@@ -118,43 +118,46 @@ export default function BrandKitPage() {
               Four distinct directions — real SVG you can refine or hand to a designer.
             </p>
             <div className="space-y-10">
-              {kit.logo_svg_concepts.map((concept) => (
-                <div
-                  key={concept.id}
-                  className="rounded-2xl border border-white/10 bg-slate-900/40 p-6 space-y-4"
-                >
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <p className="text-lg font-semibold text-white">{concept.label}</p>
-                    <span className="text-xs uppercase tracking-wider text-gray-500">
-                      {concept.id.replace(/_/g, ' ')}
-                    </span>
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-xs text-gray-500 mb-2">Icon · 48×48</p>
-                      <div className="flex gap-4 flex-wrap">
-                        <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center overflow-hidden [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:object-contain">
-                          <div dangerouslySetInnerHTML={{ __html: concept.svg }} />
-                        </div>
-                        <div className="w-12 h-12 rounded-xl bg-gray-900 border border-white/10 flex items-center justify-center overflow-hidden [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:object-contain">
-                          <div dangerouslySetInnerHTML={{ __html: concept.svg }} />
+              {kit.logo_svg_concepts.map((concept) => {
+                const usageMap: Record<string, string> = {
+                  wordmark: "Website header, email signature, documents",
+                  icon_lockup: "Social profile, business card, app icon + name",
+                  lettermark: "Favicon, app icon, profile picture, small spaces",
+                  abstract: "Brand mark, packaging seal, watermark",
+                };
+                return (
+                  <div
+                    key={concept.id}
+                    className="rounded-2xl border border-white/10 bg-slate-900/40 p-6 space-y-4"
+                  >
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="text-lg font-semibold text-white">{concept.label}</p>
+                      <span className="text-xs uppercase tracking-wider text-gray-500">
+                        {concept.id.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">Light background</p>
+                        <div className="w-full min-h-[120px] rounded-xl bg-white flex items-center justify-center p-6 overflow-hidden">
+                          <div className="w-full max-w-2xl [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-h-[120px]" dangerouslySetInnerHTML={{ __html: concept.svg }} />
                         </div>
                       </div>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 mb-2">Lockup · 200px wide</p>
-                      <div className="flex flex-col gap-3">
-                        <div className="w-[200px] min-h-[60px] rounded-xl bg-white flex items-center justify-center px-2 py-2 overflow-hidden [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-h-[60px]">
-                          <div className="w-full flex items-center justify-center" dangerouslySetInnerHTML={{ __html: concept.svg }} />
-                        </div>
-                        <div className="w-[200px] min-h-[60px] rounded-xl bg-gray-900 border border-white/10 flex items-center justify-center px-2 py-2 overflow-hidden [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-h-[60px]">
-                          <div className="w-full flex items-center justify-center" dangerouslySetInnerHTML={{ __html: concept.svg }} />
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">Dark background</p>
+                        <div className="w-full min-h-[120px] rounded-xl bg-gray-900 border border-white/10 flex items-center justify-center p-6 overflow-hidden">
+                          <div className="w-full max-w-2xl [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-h-[120px]" dangerouslySetInnerHTML={{ __html: concept.svg }} />
                         </div>
                       </div>
+                      {usageMap[concept.id] && (
+                        <p className="text-xs text-gray-400 italic">
+                          Use for: {usageMap[concept.id]}
+                        </p>
+                      )}
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         ) : (asset.logoSvg || asset.wordmarkSvg) ? (
