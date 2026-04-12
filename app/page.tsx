@@ -94,7 +94,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-950 text-white">
 
       {/* ── Hero + Generate form ───────────────────────────────────────────── */}
-      <section className="max-w-3xl mx-auto px-4 pt-24 pb-20 text-center">
+      <section id="generate" className="max-w-3xl mx-auto px-4 pt-24 pb-20 text-center scroll-mt-24">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -442,9 +442,9 @@ export default function Home() {
         </motion.div>
         <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
           {[
-            { href: '/compare/snapbrand-vs-looka', label: 'vs Looka' },
-            { href: '/compare/snapbrand-vs-canva', label: 'vs Canva' },
-            { href: '/compare/snapbrand-vs-fiverr', label: 'vs Fiverr' },
+            { href: '/snapbrand-vs-looka', label: 'vs Looka' },
+            { href: '/snapbrand-vs-canva-brand-kit', label: 'vs Canva Brand Kit' },
+            { href: '/snapbrand-vs-hatchful', label: 'vs Hatchful' },
           ].map(({ href, label }, i) => (
             <motion.div
               key={href}
@@ -461,6 +461,56 @@ export default function Home() {
                 ].join(' ')}
               >
                 SnapBrand {label}
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Guides & SEO resources ────────────────────────────────────────── */}
+      <section className="max-w-7xl mx-auto px-4 py-16 border-t border-white/10">
+        <motion.div
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.55, ease: EASE }}
+        >
+          <p className="text-sm font-semibold tracking-widest text-indigo-400 uppercase mb-3">
+            Guides
+          </p>
+          <h2 className="text-3xl font-bold text-white mb-2">Brand kit resources</h2>
+          <p className="text-gray-400 max-w-2xl mx-auto">
+            Deep dives on generators, industries, and how SnapBrand compares to other tools.
+          </p>
+        </motion.div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-5xl mx-auto">
+          {[
+            { href: '/free-brand-kit-generator', label: 'Free brand kit generator' },
+            { href: '/logo-and-brand-kit-generator', label: 'Logo & brand kit generator' },
+            { href: '/brand-kit-for-real-estate-agents', label: 'Brand kit for real estate agents' },
+            { href: '/brand-kit-for-small-business', label: 'Brand kit for small business' },
+            { href: '/brand-kit-for-startups', label: 'Brand kit for startups' },
+            { href: '/brand-kit-for-instagram', label: 'Brand kit for Instagram' },
+            { href: '/brand-kit-for-ecommerce', label: 'Brand kit for ecommerce' },
+            { href: '/snapbrand-vs-looka', label: 'SnapBrand vs Looka' },
+            { href: '/snapbrand-vs-canva-brand-kit', label: 'SnapBrand vs Canva Brand Kit' },
+            { href: '/snapbrand-vs-hatchful', label: 'SnapBrand vs Hatchful' },
+          ].map(({ href, label }, i) => (
+            <motion.div
+              key={href}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 + i * 0.04, duration: 0.45, ease: EASE }}
+            >
+              <Link
+                href={href}
+                className={[
+                  'block rounded-2xl px-5 py-3.5 text-sm',
+                  'bg-slate-900/80 backdrop-blur-2xl border border-white/10',
+                  'text-white font-medium hover:border-indigo-500/50 transition-all duration-300',
+                ].join(' ')}
+              >
+                {label} <span className="text-indigo-400">→</span>
               </Link>
             </motion.div>
           ))}

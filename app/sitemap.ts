@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { BUSINESS_TYPE_CONFIG } from "./logo-generator/[business-type]/config";
 import { getAllVerticalSlugs } from "@/lib/verticals";
 import { getAllComparisonSlugs } from "@/lib/comparisons";
+import { getSeoMarketingSlugs } from "@/lib/seo-marketing-pages";
 
 const BASE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://snapbrand-snowy.vercel.app"
@@ -31,6 +32,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: now,
     changeFrequency: "monthly" as const,
     priority: 0.7,
+  }));
+
+  const seoMarketingPages = getSeoMarketingSlugs().map((slug) => ({
+    url: `${BASE_URL}/${slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.85,
   }));
 
   const seoTemplatePages = [
@@ -92,6 +100,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     ...seoTemplatePages,
+    ...seoMarketingPages,
     ...logoGeneratorEntries,
     ...verticalPages,
     ...comparisonPages,

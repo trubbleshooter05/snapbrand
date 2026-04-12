@@ -8,6 +8,7 @@ interface Section {
 }
 
 interface SeoTemplatePageProps {
+  eyebrow?: string
   h1: string
   intro: string
   sections: Section[]
@@ -15,6 +16,7 @@ interface SeoTemplatePageProps {
 }
 
 export default function SeoTemplatePage({
+  eyebrow = 'SEO Template Guide',
   h1,
   intro,
   sections,
@@ -25,7 +27,7 @@ export default function SeoTemplatePage({
       {/* Hero Section */}
       <div className="max-w-3xl mx-auto px-4 pt-20 pb-12">
         <p className="text-sm font-semibold tracking-widest text-indigo-400 uppercase mb-4">
-          SEO Template Guide
+          {eyebrow}
         </p>
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
           {h1}
