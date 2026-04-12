@@ -8,6 +8,7 @@ import { APIError, OpenAI } from 'openai'
 import { generateLogoSVG, generateWordmarkSVG } from '@/lib/generate-logo-svg'
 import { generateLogoSvgConcepts, type LogoSvgConcept } from '@/lib/logo-concepts-openai'
 import { buildContrastSummary, dedupePaletteColors, normalizeHex } from '@/lib/color-utils'
+import { fontPairingsPromptBlock, resolveFontPairing } from '@/lib/font-pairings'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
@@ -31,6 +32,8 @@ export interface BrandKitData {
     text:       { hex: string; name: string; usage: string }
   }
   typography: {
+    /** Must be one curated id; server resolves exact Google Font names. */
+    font_pairing_id?: string
     heading_font:   string
     body_font:      string
     heading_weight: string
@@ -109,6 +112,9 @@ COLOR PALETTE RULES (critical):
 - Structure: primary = main brand color; secondary = harmonious complement or analogous tone; accent = attention-grabbing CTA/highlight; background = main light UI surfaces; text = primary body/heading color on light backgrounds.
 - Ensure implied contrast: text on background should meet WCAG AA for body copy (aim for strong contrast).
 
+TYPOGRAPHY — pick exactly ONE font_pairing_id from this curated list based on brand personality and vertical (do not invent font names; the server locks heading/body to the pairing):
+${fontPairingsPromptBlock()}
+
 JSON shape:
 {
   "brand_strategy": {
@@ -126,10 +132,11 @@ JSON shape:
     "text":       { "hex": "#XXXXXX", "name": "Color Name", "usage": "text content" }
   },
   "typography": {
-    "heading_font":   "Google Font Name",
-    "body_font":      "Google Font Name",
-    "heading_weight": "700",
-    "body_weight":    "400"
+    "font_pairing_id": "one id from the TYPOGRAPHY list above, e.g. modern-tech",
+    "heading_font":   "(echo the heading font name from that pairing)",
+    "body_font":      "(echo the body font name from that pairing)",
+    "heading_weight": "(echo from pairing)",
+    "body_weight":    "(echo from pairing)"
   },
   "typography_scale": {
     "h1": { "size": "48px", "weight": "700", "line_height": "1.2", "usage": "Page titles" },
@@ -259,6 +266,11 @@ export async function POST(request: NextRequest) {
       kit = JSON.parse(kitResponse.choices[0].message.content ?? '{}') as BrandKitData
     } catch {
       return clientError('GPT-4o returned invalid JSON. Please try again.', 500)
+    }
+
+    if (kit.typography) {
+      const resolved = resolveFontPairing(kit.typography)
+      kit.typography = { ...kit.typography, ...resolved }
     }
 
     if (kit.color_palette) {

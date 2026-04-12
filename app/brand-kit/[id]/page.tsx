@@ -283,6 +283,11 @@ export default function BrandKitPage() {
         {kit?.typography && (
           <section>
             <SectionLabel>Typography</SectionLabel>
+            {kit.typography.font_pairing_id && (
+              <p className="text-sm text-gray-500 mb-4 capitalize">
+                Curated pairing: {kit.typography.font_pairing_id.replace(/-/g, ' ')}
+              </p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white rounded-2xl p-8">
                 <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-4">Heading — {heading}</p>
