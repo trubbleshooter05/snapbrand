@@ -343,39 +343,6 @@ export default function BrandKitPage() {
           </section>
         )}
 
-        {/* ── Brand voice ───────────────────────────────────────────────────── */}
-        {kit?.brand_voice && (
-          <section>
-            <SectionLabel>Brand Voice</SectionLabel>
-            <div className="bg-slate-900/80 border border-white/10 rounded-2xl p-8 space-y-6">
-              <div>
-                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Tone</p>
-                <p className="text-lg font-medium text-white">{kit.brand_voice.tone}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Personality</p>
-                <p className="text-gray-300" style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}>
-                  {kit.brand_voice.personality}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Example Copy</p>
-                <div
-                  className="rounded-xl p-6 border-l-4 bg-white/5"
-                  style={{ borderColor: primary }}
-                >
-                  <p
-                    className="text-lg italic text-gray-200"
-                    style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}
-                  >
-                    &ldquo;{kit.brand_voice.sample_copy}&rdquo;
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* ── Brand strategy ────────────────────────────────────────────────── */}
         {kit?.brand_strategy && (
           <section>
@@ -406,6 +373,76 @@ export default function BrandKitPage() {
                   ))}
                 </div>
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── Brand voice ───────────────────────────────────────────────────── */}
+        {kit?.brand_voice && (
+          <section>
+            <SectionLabel>Brand Voice</SectionLabel>
+            <div className="bg-slate-900/80 border border-white/10 rounded-2xl p-8 space-y-6">
+              <div>
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Tone</p>
+                <p className="text-lg font-medium text-white">{kit.brand_voice.tone}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Personality</p>
+                <p className="text-gray-300" style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}>
+                  {kit.brand_voice.personality}
+                </p>
+              </div>
+              {kit.brand_voice.tone_examples && (
+                <div>
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-3">Voice in practice</p>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="rounded-xl p-5 bg-white/5 border border-white/10">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Social post</p>
+                      <p className="text-sm text-gray-200 leading-relaxed" style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}>
+                        {kit.brand_voice.tone_examples.social_post}
+                      </p>
+                    </div>
+                    <div className="rounded-xl p-5 bg-white/5 border border-white/10">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Email subject</p>
+                      <p className="text-sm text-gray-200 font-medium" style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}>
+                        {kit.brand_voice.tone_examples.email_subject}
+                      </p>
+                    </div>
+                    <div className="rounded-xl p-5 bg-white/5 border border-white/10">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Tagline / headline</p>
+                      <p className="text-sm text-gray-200 leading-relaxed" style={{ fontFamily: heading ? `'${heading}', sans-serif` : undefined }}>
+                        {kit.brand_voice.tone_examples.tagline_or_headline}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {!kit.brand_voice.tone_examples && kit.brand_voice.sample_copy && (
+                <div>
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-2">Example copy</p>
+                  <div
+                    className="rounded-xl p-6 border-l-4 bg-white/5"
+                    style={{ borderColor: primary }}
+                  >
+                    <p
+                      className="text-lg italic text-gray-200"
+                      style={{ fontFamily: body ? `'${body}', sans-serif` : undefined }}
+                    >
+                      &ldquo;{kit.brand_voice.sample_copy}&rdquo;
+                    </p>
+                  </div>
+                </div>
+              )}
+              {kit.brand_voice.brand_donts && kit.brand_voice.brand_donts.length > 0 && (
+                <div>
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-3">Brand don&rsquo;ts</p>
+                  <ul className="space-y-2 text-sm text-gray-300 list-disc list-inside">
+                    {kit.brand_voice.brand_donts.map((d, i) => (
+                      <li key={i}>{d}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </section>
         )}

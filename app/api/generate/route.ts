@@ -49,7 +49,15 @@ export interface BrandKitData {
   brand_voice: {
     tone:        string
     personality: string
-    sample_copy: string
+    /** @deprecated Prefer tone_examples */
+    sample_copy?: string
+    tone_examples?: {
+      social_post: string
+      email_subject: string
+      tagline_or_headline: string
+    }
+    /** Exactly three guardrails in strong kits */
+    brand_donts?: string[]
   }
   logo_concepts:      string[]
   logo_image_prompt:  string
@@ -85,13 +93,22 @@ COLOR PALETTE RULES (critical):
 TYPOGRAPHY — pick exactly ONE font_pairing_id from this curated list based on brand personality and vertical (do not invent font names; the server locks heading/body to the pairing):
 ${fontPairingsPromptBlock()}
 
+BRAND STRATEGY — be specific to THIS business and vertical (no generic filler):
+- positioning: Reference real market context — name competitor types, substitutes, or well-known alternatives buyers might pick (e.g. DIY tools, freelancers, agencies, marketplaces) and state how this brand is different.
+- target_audience: Include segment/demographics, 2–3 concrete pain points, and 2–3 specific online places they actually spend time (platforms, communities, search/social behaviors).
+- brand_personality & tone_of_voice: Tie traits to the offer; do NOT default to vague phrases like “confident and approachable” unless you justify them with this brand’s proof points.
+
+BRAND VOICE — concrete copy beats adjectives:
+- tone_examples MUST contain three distinct finished strings: (1) social_post — one short post in voice, (2) email_subject — subject line only, (3) tagline_or_headline — hero line or tagline. These are real copy, not descriptions of copy.
+- brand_donts: exactly 3 strings — specific things this brand must never say or do (voice/claims/tactics). This makes the guide actionable.
+
 JSON shape:
 {
   "brand_strategy": {
-    "positioning": "one sentence brand positioning statement",
-    "target_audience": "specific target audience description",
+    "positioning": "differentiation vs named competitor categories or substitutes in this vertical",
+    "target_audience": "segment, pains, and 2-3 online hangouts/channels",
     "brand_personality": ["trait1", "trait2", "trait3"],
-    "tone_of_voice": "description of tone",
+    "tone_of_voice": "how this brand sounds in practice for this audience",
     "unique_value_prop": "concise UVP"
   },
   "color_palette": {
@@ -110,9 +127,18 @@ JSON shape:
   },
   "tagline_options": ["Tagline 1", "Tagline 2", "Tagline 3"],
   "brand_voice": {
-    "tone":        "e.g. confident and approachable",
-    "personality": "2-3 sentence brand personality description",
-    "sample_copy": "One sample marketing sentence in brand voice"
+    "tone": "short label + rationale tied to this business",
+    "personality": "2-4 sentences specific to this buyer and offer",
+    "tone_examples": {
+      "social_post": "one short social post in brand voice",
+      "email_subject": "email subject line only",
+      "tagline_or_headline": "hero headline or tagline line"
+    },
+    "brand_donts": [
+      "First thing this brand must never say or do",
+      "Second guardrail",
+      "Third guardrail"
+    ]
   },
   "logo_concepts": [
     "Concept 1: visual description for a designer",
